@@ -1,0 +1,26 @@
+{
+  "name": "gulp-viewport",
+  "version": "2.3.0",
+  "description": "A gulp plugin to upload theme resources into Scroll Viewport.",
+  "dependencies": {
+  },
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/K15t/gulp-viewport.git"
+  },
+  "keywords": [
+    "gulpplugin",
+    "scroll-viewport",
+    "k15t"
+  ],
+  "author": "Stefan Kleineikenscheidt <stefan@k15t.com> (http://www.k15t.com/)",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/K15t/gulp-viewport/issues"
+  },
+  "homepage": "https://github.com/K15t/gulp-viewport#readme"
+}
