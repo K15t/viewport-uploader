@@ -2,10 +2,15 @@
 
 ## 3.0.0
 
+### Summary
 
+- `gulp-viewport` now contains only the raw functionality needed to upload files to Scroll Viewport. Everything that is not needed for this has been removed, e.g. example theme or default values. This functionality is what is provided by `viewport-tools` already. It is much easier to maintain it in one place than in two.
 
-- No default values are provided. `viewport-tools` should be used.
+### Details
 
-- Much more enhanced validation check of target environment. Same as in `viewport-tools`.
-
-- No example is provided. `viewport-tools` should be used. Only one theme needed to maintain instead of two.
+- removed "example" theme (`viewport-tools` provides "default" theme)
+- removed default values, just load `.vpconfig.json` directly (`viewport-tools` provides default values)
+- removed environmental variables, weren't used anyways, used as default values but didn't make sense because undefined
+- add more robust validation check on `.vpconfig.json` (same as in `viewport-tools`)
+- Old dependencies have been replaced:
+    - `gulp-utils` replaced for individual modules

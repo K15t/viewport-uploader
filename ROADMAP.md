@@ -2,8 +2,7 @@
 
 ## Dev ToDo
 
-- !!! Replace `this.options = options; //defaultOptions;` for new viewport-tools to work
-- put proper validation from Scroll Viewport in `envTemplate`
+- ? use only showPluginError ?
 
 ## Check
 

@@ -3,6 +3,9 @@
   "version": "2.3.0",
   "description": "A gulp plugin to upload theme resources into Scroll Viewport.",
   "dependencies": {
+    "chalk": "^3.0.0",
+    "fs-extra": "^8.1.0",
+    "node-fetch": "^2.6.0"
   },
   "main": "index.js",
   "scripts": {
