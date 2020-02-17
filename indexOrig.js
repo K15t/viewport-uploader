@@ -237,6 +237,8 @@ module.exports = class ViewportTheme {
             (cb) => {
                 let files = filesToUpload.map(item=>item.file);
                 let locations = filesToUpload.map(item=>item.path);
+
+
                 request({
                     url: strformat(options.target.confluenceBaseUrl + UPDATE_REST_URL, this.getThemeId()),
                     method: 'POST',
@@ -261,6 +263,8 @@ module.exports = class ViewportTheme {
                     }
                     cb(null);
                 })
+
+
             }
         )
     }

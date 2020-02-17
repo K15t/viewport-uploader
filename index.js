@@ -4,10 +4,14 @@
 
 const path = require('path');
 const os = require('os');
+const through = require("through2");
+const fs = require('fs');
+const slash = require("slash"); // ToDo: Can't use path.join() for URLs since on windows / would be \\
+
 const { loadConfig } = require('./lib/files.js');
-const { fetchTheme, existsTheme, createTheme } = require('./lib/network.js');
+const { fetchTheme, existsTheme, createTheme, resetTheme, uploadTheme } = require('./lib/network.js');
 const { regexVal } = require('./lib/validate.js');
-const { showThemeCreated, showPluginError } = require('./lib/chalk.js');
+const { showError, showLog } = require('./lib/chalk.js');
 
 // ----------------- Configuration ----------------- //
 
@@ -31,7 +35,6 @@ const getRestUrlForThemeObject = (baseUrl, themeName, scope) => baseUrl + `/them
 const getRestUrlForThemeCreation = (baseUrl) => baseUrl + `/theme`;
 const getRestUrlForThemeResources = (baseUrl, themeId) => baseUrl + `/theme/${themeId}/resource`;
 
-
 // ----------------- Class ----------------- //
 
 class ViewportTheme {
@@ -41,7 +44,7 @@ class ViewportTheme {
 
         // validate themeName or themeId
         if (!themeName || !envName) {
-            showPluginError(`Can't initialize ViewportTheme instance since themeName or envName are missing. Please provide both.`)
+            showError(`Can't initialize ViewportTheme instance since themeName or envName are missing. Please provide both.`)
         }
 
         // load target environment from config file
@@ -50,23 +53,23 @@ class ViewportTheme {
 
         // validate target environment, if targetEnv passes check contains exactly the properties of envTemplate
         if (!regexVal(envTemplate, targetEnv)) {
-            showPluginError(
+            showError(
                 `The target environment '${envName}' in ~/${vpconfigName} contains invalid properties. Please use 'viewport config\' to configure target environments.`);
         }
 
         // copy properties of targetEnv into 'this'
+        this.themeName = themeName;
         const envTemplateKeys = Object.keys(envTemplate);
         envTemplateKeys.forEach(item => {
             this[item] = targetEnv[item]
         });
-        this.themeName = themeName;
 
-        showThemeCreated({ 'envName': this.envName, 'themeName': this.themeName });
+        showLog(`The target environment '${envName}' will be used for the theme '${themeName}'.`);
     }
 
     // use getters for properties that depend on others to keep it dynamic
-    get headers() {
-        return { 'Authorization': 'Basic ' + Buffer.from(this.username + ':' + this.password).toString('base64') };
+    get autorisation() {
+        return 'Basic ' + Buffer.from(this.username + ':' + this.password).toString('base64');
     }
 
     get restUrlBase() {
@@ -81,72 +84,116 @@ class ViewportTheme {
         return getRestUrlForThemeCreation(this.restUrlBase);
     }
 
+    // call only in methods after create(), i.e. update() and reset()
     get restUrlForThemeResources() {
         if (!this.themeId) {
-            showPluginError(
+            showError(
                 `Can't build REST URL for theme resources because themeId isn't initialised yet. Please create the theme first.`)
         }
         return getRestUrlForThemeResources(this.restUrlBase, this.themeId);
     }
 
-    // checks if a theme exists in Scroll Viewport
-    // ToDo: Make private with ESNext, or a getter method
-    #doesThemeExist; // private property to store if theme exists
-    async exists() {
+    // private property to store if theme exists in Scroll Viewport
+    #doesThemeExist;
 
-        console.log(`Checking if theme \'${this.themeName}\' exists in Scroll Viewport...`);
+    // checks if a theme exists in Scroll Viewport
+    // ToDo: If possible in ESNext, make private method, or even better a getter method that closes over internal doesThemeExist variable
+    // so not even Class has access to it
+    async exists() {
+        showLog(`Checking if theme \'${this.themeName}\' exists in Scroll Viewport...`);
 
         // on first run set if theme exists or not
         if (this.#doesThemeExist === undefined) {
             this.#doesThemeExist = await existsTheme.apply(this);
         }
 
-        console.log(`The theme \'${this.themeName}\' does ${this.#doesThemeExist ? 'exist' : 'not exist'} in Scroll Viewport.`);
+        showLog(`The theme \'${this.themeName}\' does ${this.#doesThemeExist ? 'exist' : 'not exist'} in Scroll Viewport.`);
         return this.#doesThemeExist;
     };
 
-// ToDo: create
     // creates theme in Scroll Viewport
     async create() {
-        console.log(`Creating theme '${this.themeName}' in Scroll Viewport...`);
+        showLog(`Creating theme '${this.themeName}' in Scroll Viewport...`);
 
         if (await this.exists()) {
-            showPluginError(`Can not create theme \'${this.themeName}\' since it already exists.`)
+            showLog(`Will not create theme \'${this.themeName}\' since it already exists.`);
+            // don't throw otherwise other methods are unusable since themeId is not set yet
+            // showError(`Can not create theme \'${this.themeName}\' since it already exists.`)
+        } else {
+            await createTheme.apply(this);
+            showLog(`The theme '${this.themeName}' has been successfully created.`);
         }
 
-        const kkk = await createTheme.apply(this);
-
-        // ToDo: set themeId
-        // this.themeId = fetchThemeId.apply(this);
-        return;
+        // set themeId such that upload() and reset() can use it
+        const theme = await fetchTheme.apply(this);
+        this.themeId = theme.id;
     }
 
-    // ToDo: update
-    // overwrites existing resources with new ones in Scroll Viewport
-    async upload() {
-        console.log(`Uploading resources to theme '${this.themeName}' in Scroll Viewport...`);
-
-        if (!await this.exists()) {
-            showPluginError(
-                `Can't update resources since theme \'${this.themeName}\' doesn't exist yet in Scroll Viewport. Please create it first.`)
-        }
-
-        // can access themeId since theme exists
-        return;
-    }
-
-    // ToDo: reset
-    // removes all resources in Scroll Viewport
+    // removes all resources from theme in Scroll Viewport
     async reset() {
-        console.log(`Resetting theme '${this.themeName}' in Scroll Viewport...`);
+        showLog(`Resetting theme '${this.themeName}' in Scroll Viewport...`);
 
         if (!await this.exists()) {
-            showPluginError(
+            showError(
                 `Can't reset resources since theme \'${this.themeName}\' doesn't exist yet in Scroll Viewport. Please create it first.`)
         }
 
-        // can access themeId since theme exists
-        return;
+        await resetTheme.apply(this);
+
+        showLog(`The theme '${this.themeName}' has been successfully reset.`);
+    }
+
+    // overwrites existing resources in theme with new ones in Scroll Viewport
+    // returns a stream so other gulp plugins can be piped on to it
+    async upload() {
+        showLog(`Uploading resources to theme '${this.themeName}' in Scroll Viewport...`);
+
+        if (!await this.exists()) {
+            showError(
+                `Can't update resources since theme \'${this.themeName}\' doesn't exist yet in Scroll Viewport. Please create it first.`)
+        }
+
+
+        // ToDo: finish, just copied from indexOrig.js, not ready yet
+        return through.obj((file, enc, callback) => {
+            // ToDo: figure out if really can handle file.isStream() and file.isBuffer()
+            // this.emit('error', new PluginError(PLUGIN_NAME, 'Streams not supported!'));
+            // this.emit('error', new PluginError(PLUGIN_NAME, 'Buffers not supported!'));
+            if (file.isNull()) {
+                return callback(null, file);
+            }
+
+                //   this can be extended with following options
+                //             {
+                //                 sourceBase: 'build/css/main.css',
+                //                 targetPath: 'css/main.css'
+                //             }
+
+                // ToDo: fix what it does
+                const sourceBase = slash(path.relative(this.sourceBase, file.history[0]));
+                const relativeSourceFilePath = slash(path.relative(process.cwd(), file.history[0]));
+                const sourceBasedFilePath = slash(path.relative(this.sourceBase, relativeSourceFilePath));
+                const targetPathFilePath = slash(path.relative(this.targetPath, sourceBasedFilePath));
+                const targetPathStart = slash(path.relative(process.cwd(), this.targetPath));
+
+                const targetPath = this.targetPath.match(/\.\w+?$/) ? targetPathStart : targetPathFilePath;
+                const sourceBasePath = this.sourceBase.match(/\.\w+?$/) ? this.sourceBase : relativeSourceFilePath;
+
+                filesToUpload.push(
+                    {
+                        path: targetPath,
+                        file: fs.createReadStream(sourceBasePath)
+                    }
+                );
+
+            callback(null, file);
+
+        }, (cb) => {
+
+            const uploadedFiles = await uploadTheme.apply(this, filesToUpload);
+
+            showLog(`${uploadedFiles.length} resources for the theme '${this.themeName}' have been successfully uploaded.`);
+        });
     }
 }
 
