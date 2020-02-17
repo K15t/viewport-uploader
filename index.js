@@ -2,10 +2,12 @@
 
 // ----------------- Dependencies ----------------- //
 
+const path = require('path');
+const os = require('os');
 const { loadConfig } = require('./lib/files.js');
-const { fetchThemeId } = require('./lib/network.js');
+const { fetchTheme, existsTheme, createTheme } = require('./lib/network.js');
 const { regexVal } = require('./lib/validate.js');
-const { showThemeCreated, showError } = require('./lib/chalk.js');
+const { showThemeCreated, showPluginError } = require('./lib/chalk.js');
 
 // ----------------- Configuration ----------------- //
 
@@ -20,8 +22,8 @@ const envTemplate = {
     'username': /.*/i,
     'password': /.*/i,
     'scope': /.*/i,
-    'targetPath': /^(\.\/|\/)?(\w+\/)*$/i,
-    'sourcePath': /^(\.\/|\/)?(\w+\/)*$/i
+    'targetPath': /^(\.\/|\/)(\w+\/)*$/i,
+    'sourcePath': /^(\.\/|\/)(\w+\/)*$/i
 };
 
 const RESTURL_BASE = `/rest/scroll-viewport/1.0`;
@@ -34,21 +36,21 @@ const getRestUrlForThemeResources = (baseUrl, themeId) => baseUrl + `/theme/${th
 
 class ViewportTheme {
 
-    constructor({ themeName, themeId, envName }) {
+    constructor(themeName, envName) {
         // themeId doesn't need to be provided, can use themeName instead
 
         // validate themeName or themeId
-        if (!themeName && !themeId) {
-            showError(`Can't initialize ViewportTheme instance since themeName and themeId are missing. Please provide at least one.`)
+        if (!themeName || !envName) {
+            showPluginError(`Can't initialize ViewportTheme instance since themeName or envName are missing. Please provide both.`)
         }
 
         // load target environment from config file
         const targetEnv = loadConfig(
-            { 'envName': envName, 'vpconfigName': vpconfigName, 'vpconfigPath': vpconfigName, 'envTemplate': envTemplate });
+            { 'envName': envName, 'vpconfigName': vpconfigName, 'vpconfigPath': vpconfigPath, 'envTemplate': envTemplate });
 
         // validate target environment, if targetEnv passes check contains exactly the properties of envTemplate
         if (!regexVal(envTemplate, targetEnv)) {
-            showError(
+            showPluginError(
                 `The target environment '${envName}' in ~/${vpconfigName} contains invalid properties. Please use 'viewport config\' to configure target environments.`);
         }
 
@@ -57,42 +59,94 @@ class ViewportTheme {
         envTemplateKeys.forEach(item => {
             this[item] = targetEnv[item]
         });
+        this.themeName = themeName;
 
-        this.themeName = themeName; // could be undefined is themeId was provided
+        showThemeCreated({ 'envName': this.envName, 'themeName': this.themeName });
+    }
 
-        // compute additional properties
-        this.headers = { 'Authorization': 'Basic ' + new Buffer(this.username + ':' + this.password).toString('base64') };
-        this.restUrlBase = this.confluenceBaseUrl + RESTURL_BASE;
+    // private property to store if theme exists in Scroll Viewport
+    #doesThemeExist;
 
-        // ToDo: Don't fetchThemeId before theme is created!
-        // fetch themeId if not provided
-        if (themeId) {
-            this.themeId = themeId;
-        } else {
-            this.restUrlThemeId = getRestUrlForThemeObject(this.restUrlBase, this.themeName, this.scope);
-            this.themeId = fetchThemeId.apply(this);
+    // use getters for properties that depend on others to keep it dynamic
+    get headers() {
+        return { 'Authorization': 'Basic ' + Buffer.from(this.username + ':' + this.password).toString('base64') };
+    }
+
+    get restUrlBase() {
+        return this.confluenceBaseUrl + RESTURL_BASE;
+    }
+
+    get restUrlForThemeObject() {
+        return getRestUrlForThemeObject(this.restUrlBase, this.themeName, this.scope);
+    }
+
+    get restUrlForThemeCreation() {
+        return getRestUrlForThemeCreation(this.restUrlBase);
+    }
+
+    get restUrlForThemeResources() {
+        if (!this.themeId) {
+            showPluginError(`Can't build REST URL for theme resources because themeId isn't initialised yet. Please create the theme first.`)
+        }
+        return getRestUrlForThemeResources(this.restUrlBase, this.themeId);
+    }
+
+    // checks if a theme exists in Scroll Viewport
+    // ToDo: Make private with ESNext
+    async exists() {
+        if (this.#doesThemeExist === undefined) {
+            console.log(`Checking if theme \'${this.themeName}\' exists in Scroll Viewport...`);
+            this.#doesThemeExist = await existsTheme.apply(this);
+            console.log(`The theme \'${this.themeName}\' does ${this.#doesThemeExist ? 'exist' : 'not exist'} in Scroll Viewport.`);
+        }
+    }
+
+
+// ToDo: create
+    // creates theme in Scroll Viewport
+    async create() {
+        console.log(`Creating theme '${this.themeName}' in Scroll Viewport...`);
+
+        await this.exists();
+
+        if (this.#doesThemeExist) {
+            showPluginError(`Can not create theme \'${this.themeName}\' since it already exists.`)
         }
 
-        showThemeCreated({ 'envName': envName, 'themeName': themeName, 'themeId': themeId });
-    }
+        const kkk = await createTheme.apply(this);
 
-    // ToDo: create
-    create() {
-        return;
-    }
-
-    // ToDo: exists
-    exists() {
+        // ToDo: set themeId
+        // this.themeId = fetchThemeId.apply(this);
         return;
     }
 
     // ToDo: update
-    update() {
+    // overwrites existing resources with new ones in Scroll Viewport
+    async upload() {
+        console.log(`Uploading resources to theme '${this.themeName}' in Scroll Viewport...`);
+
+        await this.exists();
+
+        if (!this.#doesThemeExist) {
+            showPluginError(`Can't update resources since theme \'${this.themeName}\' doesn't exist yet in Scroll Viewport. Please create it first.`)
+        }
+
+        // can access themeId since theme exists
         return;
     }
 
     // ToDo: reset
-    reset() {
+    // removes all resources in Scroll Viewport
+    async reset() {
+        console.log(`Resetting theme '${this.themeName}' in Scroll Viewport...`);
+
+        await this.exists();
+
+        if (!this.#doesThemeExist) {
+            showPluginError(`Can't reset resources since theme \'${this.themeName}\' doesn't exist yet in Scroll Viewport. Please create it first.`)
+        }
+
+        // can access themeId since theme exists
         return;
     }
 }

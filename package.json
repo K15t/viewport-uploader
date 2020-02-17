@@ -5,7 +5,8 @@
   "dependencies": {
     "chalk": "^3.0.0",
     "fs-extra": "^8.1.0",
-    "node-fetch": "^2.6.0"
+    "node-fetch": "^2.6.0",
+    "plugin-error": "^1.0.1"
   },
   "main": "index.js",
   "scripts": {
