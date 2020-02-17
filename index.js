@@ -64,9 +64,6 @@ class ViewportTheme {
         showThemeCreated({ 'envName': this.envName, 'themeName': this.themeName });
     }
 
-    // private property to store if theme exists in Scroll Viewport
-    #doesThemeExist;
-
     // use getters for properties that depend on others to keep it dynamic
     get headers() {
         return { 'Authorization': 'Basic ' + Buffer.from(this.username + ':' + this.password).toString('base64') };
@@ -86,30 +83,34 @@ class ViewportTheme {
 
     get restUrlForThemeResources() {
         if (!this.themeId) {
-            showPluginError(`Can't build REST URL for theme resources because themeId isn't initialised yet. Please create the theme first.`)
+            showPluginError(
+                `Can't build REST URL for theme resources because themeId isn't initialised yet. Please create the theme first.`)
         }
         return getRestUrlForThemeResources(this.restUrlBase, this.themeId);
     }
 
     // checks if a theme exists in Scroll Viewport
-    // ToDo: Make private with ESNext
+    // ToDo: Make private with ESNext, or a getter method
+    #doesThemeExist; // private property to store if theme exists
     async exists() {
-        if (this.#doesThemeExist === undefined) {
-            console.log(`Checking if theme \'${this.themeName}\' exists in Scroll Viewport...`);
-            this.#doesThemeExist = await existsTheme.apply(this);
-            console.log(`The theme \'${this.themeName}\' does ${this.#doesThemeExist ? 'exist' : 'not exist'} in Scroll Viewport.`);
-        }
-    }
 
+        console.log(`Checking if theme \'${this.themeName}\' exists in Scroll Viewport...`);
+
+        // on first run set if theme exists or not
+        if (this.#doesThemeExist === undefined) {
+            this.#doesThemeExist = await existsTheme.apply(this);
+        }
+
+        console.log(`The theme \'${this.themeName}\' does ${this.#doesThemeExist ? 'exist' : 'not exist'} in Scroll Viewport.`);
+        return this.#doesThemeExist;
+    };
 
 // ToDo: create
     // creates theme in Scroll Viewport
     async create() {
         console.log(`Creating theme '${this.themeName}' in Scroll Viewport...`);
 
-        await this.exists();
-
-        if (this.#doesThemeExist) {
+        if (await this.exists()) {
             showPluginError(`Can not create theme \'${this.themeName}\' since it already exists.`)
         }
 
@@ -125,10 +126,9 @@ class ViewportTheme {
     async upload() {
         console.log(`Uploading resources to theme '${this.themeName}' in Scroll Viewport...`);
 
-        await this.exists();
-
-        if (!this.#doesThemeExist) {
-            showPluginError(`Can't update resources since theme \'${this.themeName}\' doesn't exist yet in Scroll Viewport. Please create it first.`)
+        if (!await this.exists()) {
+            showPluginError(
+                `Can't update resources since theme \'${this.themeName}\' doesn't exist yet in Scroll Viewport. Please create it first.`)
         }
 
         // can access themeId since theme exists
@@ -140,10 +140,9 @@ class ViewportTheme {
     async reset() {
         console.log(`Resetting theme '${this.themeName}' in Scroll Viewport...`);
 
-        await this.exists();
-
-        if (!this.#doesThemeExist) {
-            showPluginError(`Can't reset resources since theme \'${this.themeName}\' doesn't exist yet in Scroll Viewport. Please create it first.`)
+        if (!await this.exists()) {
+            showPluginError(
+                `Can't reset resources since theme \'${this.themeName}\' doesn't exist yet in Scroll Viewport. Please create it first.`)
         }
 
         // can access themeId since theme exists
