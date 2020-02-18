@@ -8,6 +8,9 @@ The `gulp-viewport` package is a gulp plugin to upload local resources to Scroll
 
 <!-- ToDo: finish -->
 
+### Configuration
+
+<!-- ToDo: How .vpconfig.json works -->
 
 ## Roadmap
 

@@ -4,9 +4,7 @@
 
 const path = require('path');
 const os = require('os');
-const through = require("through2");
 const fs = require('fs');
-const slash = require("slash"); // ToDo: Can't use path.join() for URLs since on windows / would be \\
 
 const { loadConfig } = require('./lib/files.js');
 const { fetchTheme, existsTheme, createTheme, resetTheme, uploadTheme } = require('./lib/network.js');
@@ -40,6 +38,7 @@ const getRestUrlForThemeResources = (baseUrl, themeId) => baseUrl + `/theme/${th
 class ViewportTheme {
 
     constructor(themeName, envName) {
+        showLog(`The target environment '${envName}' will be used for the theme '${themeName}'.`);
         // themeId doesn't need to be provided, can use themeName instead
 
         // validate themeName or themeId
@@ -48,8 +47,7 @@ class ViewportTheme {
         }
 
         // load target environment from config file
-        const targetEnv = loadConfig(
-            { 'envName': envName, 'vpconfigName': vpconfigName, 'vpconfigPath': vpconfigPath, 'envTemplate': envTemplate });
+        const targetEnv = loadConfig(envName, vpconfigName, vpconfigPath, envTemplate);
 
         // validate target environment, if targetEnv passes check contains exactly the properties of envTemplate
         if (!regexVal(envTemplate, targetEnv)) {
@@ -63,8 +61,6 @@ class ViewportTheme {
         envTemplateKeys.forEach(item => {
             this[item] = targetEnv[item]
         });
-
-        showLog(`The target environment '${envName}' will be used for the theme '${themeName}'.`);
     }
 
     // use getters for properties that depend on others to keep it dynamic
@@ -97,8 +93,7 @@ class ViewportTheme {
     #doesThemeExist;
 
     // checks if a theme exists in Scroll Viewport
-    // ToDo: If possible in ESNext, make private method, or even better a getter method that closes over internal doesThemeExist variable
-    // so not even Class has access to it
+    // ToDo: If possible in ESNext, make private method, or even better a getter method that closes over internal doesThemeExist variable so not even class has access to it
     async exists() {
         showLog(`Checking if theme \'${this.themeName}\' exists in Scroll Viewport...`);
 
@@ -145,7 +140,7 @@ class ViewportTheme {
 
     // overwrites existing resources in theme with new ones in Scroll Viewport
     // returns a stream so other gulp plugins can be piped on to it
-    async upload() {
+    async upload(filePaths) {
         showLog(`Uploading resources to theme '${this.themeName}' in Scroll Viewport...`);
 
         if (!await this.exists()) {
@@ -153,47 +148,7 @@ class ViewportTheme {
                 `Can't update resources since theme \'${this.themeName}\' doesn't exist yet in Scroll Viewport. Please create it first.`)
         }
 
-
-        // ToDo: finish, just copied from indexOrig.js, not ready yet
-        return through.obj((file, enc, callback) => {
-            // ToDo: figure out if really can handle file.isStream() and file.isBuffer()
-            // this.emit('error', new PluginError(PLUGIN_NAME, 'Streams not supported!'));
-            // this.emit('error', new PluginError(PLUGIN_NAME, 'Buffers not supported!'));
-            if (file.isNull()) {
-                return callback(null, file);
-            }
-
-                //   this can be extended with following options
-                //             {
-                //                 sourceBase: 'build/css/main.css',
-                //                 targetPath: 'css/main.css'
-                //             }
-
-                // ToDo: fix what it does
-                const sourceBase = slash(path.relative(this.sourceBase, file.history[0]));
-                const relativeSourceFilePath = slash(path.relative(process.cwd(), file.history[0]));
-                const sourceBasedFilePath = slash(path.relative(this.sourceBase, relativeSourceFilePath));
-                const targetPathFilePath = slash(path.relative(this.targetPath, sourceBasedFilePath));
-                const targetPathStart = slash(path.relative(process.cwd(), this.targetPath));
-
-                const targetPath = this.targetPath.match(/\.\w+?$/) ? targetPathStart : targetPathFilePath;
-                const sourceBasePath = this.sourceBase.match(/\.\w+?$/) ? this.sourceBase : relativeSourceFilePath;
-
-                filesToUpload.push(
-                    {
-                        path: targetPath,
-                        file: fs.createReadStream(sourceBasePath)
-                    }
-                );
-
-            callback(null, file);
-
-        }, (cb) => {
-
-            const uploadedFiles = await uploadTheme.apply(this, filesToUpload);
-
-            showLog(`${uploadedFiles.length} resources for the theme '${this.themeName}' have been successfully uploaded.`);
-        });
+        // ToDo: implement simple upload for files from a folder
     }
 }
 
