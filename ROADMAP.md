@@ -8,7 +8,6 @@
 
 ## Check
 
-- Return promise in viewportTheme.create that resolves if theme could be created / already is created, rejects otherwise
   then only `return viewportTheme.create();` in `create` task in `gulpfile.js`
 - Does viewportTheme.upload() return stream or why can pipe ?
 - Difference if pipes to upload before or after dest write ?
@@ -17,10 +16,9 @@
 
 ## NPM Package
 
-- ? bundle with viewport-tools to make only one package ?
+- ? bundle with viewport-tools to make only one package ? isn't a valid gulp-plugin anyways
 
-## Check Gulp Plugin Guidelines
+## ESNext
 
-[Guidelines](https://github.com/gulpjs/gulp/blob/master/docs/writing-a-plugin/guidelines.md)
-
-- 7: Do not throw errors inside a stream. Instead, you should emit it as an error event.
+- With ESNext make getters private
+- Use async functions already in constructor to compute doesThemeExist and themeId
