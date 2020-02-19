@@ -13,7 +13,8 @@ const { showLog } = require('./lib/console.js');
 
 // ----------------- Configuration ----------------- //
 
-const PLUGIN_NAME = 'gulp-viewport';
+const PLUGIN_NAME = 'viewport-sync';
+exports.PLUGIN_NAME = PLUGIN_NAME;
 
 const vpconfigName = ".vpconfig.json";
 const vpconfigPath = path.join(os.homedir(), vpconfigName); // absolute path
@@ -157,7 +158,7 @@ class ViewportTheme {
     }
 
     // overwrites existing resources in theme with new ones in Scroll Viewport
-    async upload(args) {
+    async upload(options) {
 
         // obligatory existence check
         if (!await this.exists()) {
@@ -165,19 +166,19 @@ class ViewportTheme {
                 `Can't update resources since theme \'${this.themeName}\' doesn't exist yet in Scroll Viewport. Please create it first.`)
         }
 
-        // validate arguments, if args passes check contains exactly the properties of uplTemplate
-        if (!regexVal(uplTemplate, args)) {
+        // validate arguments, if options passes check contains exactly the properties of uplTemplate
+        if (!regexVal(uplTemplate, options)) {
             throw new PluginError(PLUGIN_NAME,
                 `The arguments passed are invalid. Please provide an object of the form \'{ ${Object.keys(uplTemplate).join(", ")} }\'.`);
         }
 
         // compute paths
-        const {targetPath, sourcePath, globString} = args;
+        const {targetPath, sourcePath, globString: glob} = options;
 
-        let sourcePaths = await resolveGlob(globString);
+        let sourcePaths = await resolveGlob(glob);
 
         if (!sourcePaths.length) {
-            showLog(`Won't upload since no files matching the glob pattern \'${globString}\' were found.`);
+            showLog(`Won't upload since no files matching the glob pattern \'${glob}\' were found.`);
             return; // break out of function, async func returns a resolved promise with value undefined, same as if it finished until end
         }
 

@@ -1,13 +1,12 @@
 {
-  "name": "gulp-viewport",
+  "name": "viewport-sync",
   "version": "2.3.0",
-  "description": "A gulp plugin to upload theme resources into Scroll Viewport.",
+  "description": "A node module to upload theme resources to Scroll Viewport.",
   "dependencies": {
     "chalk": "^3.0.0",
     "form-data": "^3.0.0",
     "fs-extra": "^8.1.0",
-    "glob": "^7.1.6",
-    "glob-promise": "^3.4.0",
+    "globby": "^11.0.0",
     "node-fetch": "^2.6.0",
     "plugin-error": "^1.0.1",
     "slash": "^3.0.0"
@@ -18,17 +17,17 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/K15t/gulp-viewport.git"
+    "url": "git+https://github.com/K15t/viewport-sync.git"
   },
   "keywords": [
-    "gulpplugin",
+    "viewport-sync",
     "scroll-viewport",
     "k15t"
   ],
   "author": "Stefan Kleineikenscheidt <stefan@k15t.com> (http://www.k15t.com/)",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/K15t/gulp-viewport/issues"
+    "url": "https://github.com/K15t/viewport-sync/issues"
   },
-  "homepage": "https://github.com/K15t/gulp-viewport#readme"
+  "homepage": "https://github.com/K15t/viewport-sync#readme"
 }

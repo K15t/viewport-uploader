@@ -5,6 +5,7 @@
 - ? use only showPluginError ?
 - ? use stream.emit("error") for stream ?
 - ? use form-data in upload() ? 
+- ? Can throw errors outside the pipe ?
 
 ## Check
 
