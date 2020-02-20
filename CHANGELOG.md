@@ -30,13 +30,14 @@ Now it took us some time to realise our mistakes, but we don't want to be a bad 
     - accepts only `envName` and `themeName`, target environment is then loaded from `.vpconfig.json`, much easier for `viewport-tools` to create themes
     - add more robust validation check (same as in `viewport-tools`)
     - remove nested properties, e.g. `mytheme.options.target.confluenceBaseUrl` in favor of flat properties
-- Old dependencies have been replaced or removed if possible, e.g. `gulp-utils`, `request`
+- Old dependencies have been replaced or removed if possible
+    - replaced `request` with `node-fetch` and `form-data`
+    - removed `gulp-utils`, `through2` (no streams!), `home-config`, and some others
 - Removed "example" theme (see `viewport-tools` "default" theme instead)
    
 #### constructor
 
-- removed `themeId` argument in favor of loading it on first `create()` call, less complex to have only one variable (doesThemeExist) instead of two (doesThemeExist, themeId) for which need to check independently before can safely run any method
-- removed target environment default values via environmental variables, in favor of default values provided by `viewport-tools` on creation of `.vpconfig.json` (Maybe bring back?)
+- Removed `themeId` argument in favor of loading it on first `create()` call, less complex to have only one variable (doesThemeExist) instead of two (doesThemeExist, themeId) for which need to check independently before can safely run any method.
 
 #### `upload()` method
 

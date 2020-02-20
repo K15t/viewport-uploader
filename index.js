@@ -6,6 +6,7 @@ const path = require('path');
 const os = require('os');
 const PluginError = require('plugin-error');
 
+// ToDo: use async loadConfig instead of loadConfigSync
 const { loadConfig, loadConfigSync, createFormData, resolveGlob } = require('./lib/files.js');
 const { fetchTheme, existsTheme, createTheme, resetTheme, uploadTheme } = require('./lib/network.js');
 const { regexVal } = require('./lib/validate.js');
@@ -35,6 +36,14 @@ const uplTemplate = {
     'globString': /.*/i,
 };
 
+const envVarNames = {
+    'envName': 'VPRT_ENV',
+    'confluenceBaseUrl': 'VPRT_CONFLUENCEBASEURL',
+    'username': 'VPRT_USERNAME',
+    'password': 'VPRT_PASSWORD',
+    'scope': 'VPRT_SCOPE',
+};
+
 const RESTURL_BASE = `/rest/scroll-viewport/1.0`;
 const getRestUrlForThemeObject = (baseUrl, themeName, scope) => baseUrl + `/theme?name=${themeName}&scope=${scope}`;
 const getRestUrlForThemeCreation = (baseUrl) => baseUrl + `/theme`;
@@ -50,16 +59,36 @@ class ViewportTheme {
     // ------------ Constructor ------------ //
 
     constructor(themeName, envName) {
-        showLog(`The target environment '${envName}' will be used for the theme '${themeName}'.`);
 
-        // validate themeName or themeId
-        if (!themeName || !envName) {
-            throw new PluginError(PLUGIN_NAME, `Can't initialize ViewportTheme instance since themeName or envName are missing. Please provide both.`)
+        // validate that themeName is provided
+        if (!themeName) {
+            throw new PluginError(PLUGIN_NAME, `Can't initialize ViewportTheme instance since themeName is missing.`)
         }
 
-        // ToDo: with ESNext make async constructor
-        // load target environment from config file
-        const targetEnv = loadConfigSync(envName, vpconfigName, vpconfigPath, envTemplate);
+        let targetEnv;
+
+        // if envName is provided use config file
+        if (envName) {
+
+            // ToDo: with ESNext make async constructor
+            // load target environment from config file
+            targetEnv = loadConfigSync(envName, vpconfigName, vpconfigPath, envTemplate);
+
+            // if not, use environmental variables, if they all exist
+        } else if (Object.values(envVarNames).every(item => !!process.env[item])) {
+
+            targetEnv = Object.keys(envTemplate).reduce((acc, item) => {
+                acc[item] = process.env[envVarNames[item]];
+                return acc;
+            }, {});
+
+            // else throw
+        } else {
+            throw new PluginError(PLUGIN_NAME,
+                `Can't initialize ViewportTheme instance since envName or environmental variables are missing.`)
+        }
+
+        showLog(`The target environment '${envName || process.env.VPRT_ENV}' will be used for the theme '${themeName}'.`);
 
         // validate target environment, if targetEnv passes check contains exactly the properties of envTemplate
         if (!regexVal(envTemplate, targetEnv)) {
@@ -67,15 +96,15 @@ class ViewportTheme {
                 `The target environment '${envName}' in ~/${vpconfigName} contains invalid properties. Please use 'viewport config\' to configure target environments.`);
         }
 
-        // copy properties of targetEnv into 'this'
-        this.themeName = themeName;
-
+        // set properties of 'this' from targetEnv
         const envTemplateKeys = Object.keys(envTemplate);
         envTemplateKeys.forEach(item => {
-            this[item] = targetEnv[item]
+            this[item] = targetEnv[item];
         });
 
-        // Note: set later in create() because JS doesn't support async functions inside constructor (yet)
+        // set remaining properties of 'this'
+        this.themeName = themeName;
+        // Note: set the following later in create() because JS doesn't support async functions inside constructors (yet)
         this.themeId = undefined;
         this.#doesThemeExist = undefined;
     }
@@ -109,8 +138,8 @@ class ViewportTheme {
 
     // ------------ Methods on prototype chain ------------ //
 
-    // ToDo: If possible in ESNext, make private method, or even better a async getter method that closes over doesThemeExist variable so not even class has access to it
-    // checks if a theme exists in Scroll Viewport
+    // ToDo: In ESNext make exists() a private method, or even better a private getter method that closes over doesThemeExist variable so
+    // not even class has access to it checks if a theme exists in Scroll Viewport
     async exists() {
 
         // on first run set if theme exists or not
@@ -173,7 +202,7 @@ class ViewportTheme {
         }
 
         // compute paths
-        const {targetPath, sourcePath, globString: glob} = options;
+        const { targetPath, sourcePath, globString: glob } = options;
 
         let sourcePaths = await resolveGlob(glob);
 
@@ -186,7 +215,9 @@ class ViewportTheme {
 
         // log paths
         showLog(`Uploading ${sourcePaths.length} resources to theme '${this.themeName}' in Scroll Viewport...`);
-        sourcePaths.forEach((_, i) => {console.log(sourcePaths[i] + " => " + targetPaths[i])});
+        sourcePaths.forEach((_, i) => {
+            console.log(sourcePaths[i] + " => " + targetPaths[i])
+        });
 
         // create form data and upload
         const formData = await createFormData(sourcePaths, targetPaths);
@@ -194,7 +225,9 @@ class ViewportTheme {
 
         // log success
         showLog(`${uploadedFilePaths.length} resources for the theme '${this.themeName}' have been successfully uploaded.`);
-        uploadedFilePaths.forEach(item => {console.log(item)});
+        uploadedFilePaths.forEach(item => {
+            console.log(item)
+        });
     }
 }
 

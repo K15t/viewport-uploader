@@ -1,23 +1,10 @@
 # Roadmap
 
-## Dev ToDo
+## Misc
 
-- ? use only showPluginError ?
-- ? use stream.emit("error") for stream ?
-- ? use form-data in upload() ? 
-- ? Can throw errors outside the pipe ?
-
-## Check
-
-  then only `return viewportTheme.create();` in `create` task in `gulpfile.js`
-- Does viewportTheme.upload() return stream or why can pipe ?
-- Difference if pipes to upload before or after dest write ?
-- Remove unnecessary SCOPE theme property ?
-- upload everything to root of VPRT, frameworks, targetPath?
-
-## NPM Package
-
-- ? bundle with viewport-tools to make only one package ? isn't a valid gulp-plugin anyways
+- progress bar for upload: get notified by file stream in form-data, use total file size as reference
+- put proper validation from Scroll Viewport in `envTemplate`
+- TODO: TEST EVERYTHING, INCLUDING ENV VARIABLES
 
 ## ESNext
 
