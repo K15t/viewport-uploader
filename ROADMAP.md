@@ -8,5 +8,5 @@
 
 ## ESNext
 
-- With ESNext make getters private
+- Make `exists()` private (as of ES2020 methods this is still a [proposal](https://github.com/tc39/proposal-private-methods))
 - Use async functions already in constructor to compute doesThemeExist and themeId

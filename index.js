@@ -9,31 +9,30 @@ const PluginError = require('plugin-error');
 // ToDo: use async loadConfig instead of loadConfigSync
 const { loadConfig, loadConfigSync, createFormData, resolveGlob } = require('./lib/files.js');
 const { fetchTheme, existsTheme, createTheme, resetTheme, uploadTheme } = require('./lib/network.js');
-const { regexVal } = require('./lib/validate.js');
+const { regexVal, regexValArr } = require('./lib/validate.js');
 const { showLog } = require('./lib/console.js');
 
 // ----------------- Configuration ----------------- //
 
 const PLUGIN_NAME = 'viewport-sync';
-exports.PLUGIN_NAME = PLUGIN_NAME;
 
 const vpconfigName = ".vpconfig.json";
 const vpconfigPath = path.join(os.homedir(), vpconfigName); // absolute path
 
-// ToDo: put in proper restrictions from Scroll Viewport
+// ToDo: put in proper restrictions from Scroll Viewport for envName, username, password
 // Note: If you change something here change it in viewport-tools as well!
 const envTemplate = {
     'envName': /.*/i,
     'confluenceBaseUrl': /^(https?):\/\/[^\s$.?#].[^\s]*[^/]$/i,
     'username': /.*/i,
     'password': /.*/i,
-    'scope': /.*/i,
+    'scope': /^[a-z0-9]{0,255}$/i, // https://confluence.atlassian.com/doc/space-keys-829076188.html
 };
 
 const uplTemplate = {
     'targetPath': /^(\w+\/)*$/i,
     'sourcePath': /^(\w+\/)*$/i,
-    'globString': /.*/i,
+    'glob': /.*/i,
 };
 
 const envVarNames = {
@@ -58,7 +57,7 @@ class ViewportTheme {
 
     // ------------ Constructor ------------ //
 
-    constructor(themeName, envName) {
+    constructor({ themeName, envName }) {
 
         // validate that themeName is provided
         if (!themeName) {
@@ -144,11 +143,11 @@ class ViewportTheme {
 
         // on first run set if theme exists or not
         if (this.#doesThemeExist === undefined) {
-            showLog(`Checking if theme \'${this.themeName}\' exists in Scroll Viewport...`);
+            // showLog(`Checking if theme \'${this.themeName}\' exists in Scroll Viewport...`);
             this.#doesThemeExist = await existsTheme.apply(this);
         }
 
-        showLog(`The theme \'${this.themeName}\' does ${this.#doesThemeExist ? 'exist' : 'not exist'} in Scroll Viewport.`);
+        // showLog(`The theme \'${this.themeName}\' does ${this.#doesThemeExist ? 'exist' : 'not exist'} in Scroll Viewport.`);
         return this.#doesThemeExist;
     };
 
@@ -156,13 +155,13 @@ class ViewportTheme {
     async create() {
 
         if (await this.exists()) {
-            showLog(`Won't create theme \'${this.themeName}\' since it already exists.`);
+            // showLog(`Won't create theme \'${this.themeName}\' since it already exists.`);
             // don't throw otherwise other methods are unusable since themeId is not set yet
             // throw new PluginError(PLUGIN_NAME, `Can not create theme \'${this.themeName}\' since it already exists.`)
         } else {
-            showLog(`Creating theme '${this.themeName}' in Scroll Viewport...`);
+            // showLog(`Creating theme '${this.themeName}' in Scroll Viewport...`);
             await createTheme.apply(this);
-            showLog(`The theme '${this.themeName}' has been successfully created.`);
+            // showLog(`The theme '${this.themeName}' has been successfully created.`);
         }
 
         // set themeId such that upload() and reset() can use it
@@ -179,11 +178,11 @@ class ViewportTheme {
                 `Can't reset resources since theme \'${this.themeName}\' doesn't exist yet in Scroll Viewport. Please create it first.`)
         }
 
-        showLog(`Resetting theme '${this.themeName}' in Scroll Viewport...`);
+        // showLog(`Resetting theme '${this.themeName}' in Scroll Viewport...`);
 
         await resetTheme.apply(this);
 
-        showLog(`The theme '${this.themeName}' has been successfully reset.`);
+        // showLog(`The theme '${this.themeName}' has been successfully reset.`);
     }
 
     // overwrites existing resources in theme with new ones in Scroll Viewport
@@ -196,13 +195,13 @@ class ViewportTheme {
         }
 
         // validate arguments, if options passes check contains exactly the properties of uplTemplate
-        if (!regexVal(uplTemplate, options)) {
+        if (!regexValArr(uplTemplate, options)) {
             throw new PluginError(PLUGIN_NAME,
-                `The arguments passed are invalid. Please provide an object of the form \'{ ${Object.keys(uplTemplate).join(", ")} }\'.`);
+                `The options passed to upload() are invalid. Please provide options ${Object.keys(uplTemplate).join(", ")} according to the documentation.`);
         }
 
         // compute paths
-        const { targetPath, sourcePath, globString: glob } = options;
+        const { targetPath, sourcePath, glob } = options;
 
         let sourcePaths = await resolveGlob(glob);
 
@@ -224,11 +223,12 @@ class ViewportTheme {
         const uploadedFilePaths = await uploadTheme.call(this, formData);
 
         // log success
-        showLog(`${uploadedFilePaths.length} resources for the theme '${this.themeName}' have been successfully uploaded.`);
+        showLog(`The following ${uploadedFilePaths.length} resources have been successfully uploaded.`);
         uploadedFilePaths.forEach(item => {
             console.log(item)
         });
     }
 }
 
-exports.ViewportTheme = ViewportTheme;
+module.exports = ViewportTheme;
+exports.PLUGIN_NAME = PLUGIN_NAME;
