@@ -52,9 +52,6 @@ const getRestUrlForThemeResources = (baseUrl, themeId) => baseUrl + `/theme/${th
 
 class ViewportTheme {
 
-    // private property to store if theme exists in Scroll Viewport
-    #doesThemeExist;
-
     // ------------ Constructor ------------ //
 
     constructor({ themeName, envName }) {
@@ -105,7 +102,7 @@ class ViewportTheme {
         this.themeName = themeName;
         // Note: set the following later in create() because JS doesn't support async functions inside constructors (yet)
         this.themeId = undefined;
-        this.#doesThemeExist = undefined;
+        this.doesThemeExist = undefined;
     }
 
     // ------------ Getters ------------ //
@@ -142,13 +139,13 @@ class ViewportTheme {
     async exists() {
 
         // on first run set if theme exists or not
-        if (this.#doesThemeExist === undefined) {
+        if (this.doesThemeExist === undefined) {
             showLog(`Checking if theme \'${this.themeName}\' exists in Scroll Viewport...`);
-            this.#doesThemeExist = await existsTheme.apply(this);
+            this.doesThemeExist = await existsTheme.apply(this);
         }
 
-        showLog(`The theme \'${this.themeName}\' does ${this.#doesThemeExist ? 'exist' : 'not exist'} in Scroll Viewport.`);
-        return this.#doesThemeExist;
+        showLog(`The theme \'${this.themeName}\' does ${this.doesThemeExist ? 'exist' : 'not exist'} in Scroll Viewport.`);
+        return this.doesThemeExist;
     };
 
     // creates theme in Scroll Viewport
@@ -162,7 +159,7 @@ class ViewportTheme {
             showLog(`Creating theme '${this.themeName}' in Scroll Viewport...`);
             await createTheme.apply(this);
             showLog(`The theme '${this.themeName}' has been successfully created.`);
-            this.#doesThemeExist = true;
+            this.doesThemeExist = true;
         }
 
         // set themeId such that upload() and reset() can use it
