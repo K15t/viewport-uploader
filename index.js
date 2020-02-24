@@ -143,11 +143,11 @@ class ViewportTheme {
 
         // on first run set if theme exists or not
         if (this.#doesThemeExist === undefined) {
-            // showLog(`Checking if theme \'${this.themeName}\' exists in Scroll Viewport...`);
+            showLog(`Checking if theme \'${this.themeName}\' exists in Scroll Viewport...`);
             this.#doesThemeExist = await existsTheme.apply(this);
         }
 
-        // showLog(`The theme \'${this.themeName}\' does ${this.#doesThemeExist ? 'exist' : 'not exist'} in Scroll Viewport.`);
+        showLog(`The theme \'${this.themeName}\' does ${this.#doesThemeExist ? 'exist' : 'not exist'} in Scroll Viewport.`);
         return this.#doesThemeExist;
     };
 
@@ -155,13 +155,14 @@ class ViewportTheme {
     async create() {
 
         if (await this.exists()) {
-            // showLog(`Won't create theme \'${this.themeName}\' since it already exists.`);
+            showLog(`Won't create theme \'${this.themeName}\' since it already exists.`);
             // don't throw otherwise other methods are unusable since themeId is not set yet
             // throw new PluginError(PLUGIN_NAME, `Can not create theme \'${this.themeName}\' since it already exists.`)
         } else {
-            // showLog(`Creating theme '${this.themeName}' in Scroll Viewport...`);
+            showLog(`Creating theme '${this.themeName}' in Scroll Viewport...`);
             await createTheme.apply(this);
-            // showLog(`The theme '${this.themeName}' has been successfully created.`);
+            showLog(`The theme '${this.themeName}' has been successfully created.`);
+            this.#doesThemeExist = true;
         }
 
         // set themeId such that upload() and reset() can use it
@@ -178,11 +179,11 @@ class ViewportTheme {
                 `Can't reset resources since theme \'${this.themeName}\' doesn't exist yet in Scroll Viewport. Please create it first.`)
         }
 
-        // showLog(`Resetting theme '${this.themeName}' in Scroll Viewport...`);
+        showLog(`Resetting theme '${this.themeName}' in Scroll Viewport...`);
 
         await resetTheme.apply(this);
 
-        // showLog(`The theme '${this.themeName}' has been successfully reset.`);
+        showLog(`The theme '${this.themeName}' has been successfully reset.`);
     }
 
     // overwrites existing resources in theme with new ones in Scroll Viewport

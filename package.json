@@ -1,6 +1,6 @@
 {
   "name": "viewport-sync",
-  "version": "2.3.0",
+  "version": "3.0.0",
   "description": "A node module to upload theme resources to Scroll Viewport.",
   "dependencies": {
     "chalk": "^3.0.0",
