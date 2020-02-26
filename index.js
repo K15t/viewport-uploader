@@ -70,6 +70,8 @@ class ViewportTheme {
             // load target environment from config file
             targetEnv = loadConfigSync(envName, vpconfigName, vpconfigPath, envTemplate);
 
+            showLog(`The target environment '${envName}' out of the '${vpconfigName}' config file will be used for the theme '${themeName}'.`);
+
             // if not, use environmental variables, if they all exist
         } else if (Object.values(envVarNames).every(item => !!process.env[item])) {
 
@@ -78,13 +80,13 @@ class ViewportTheme {
                 return acc;
             }, {});
 
+            showLog(`The target environment '${process.env.VPRT_ENV}' out of the environmental variables will be used for the theme '${themeName}'.`);
+
             // else throw
         } else {
             throw new PluginError(PLUGIN_NAME,
                 `Can't initialize ViewportTheme instance since envName or environmental variables are missing.`)
         }
-
-        showLog(`The target environment '${envName || process.env.VPRT_ENV}' will be used for the theme '${themeName}'.`);
 
         // validate target environment, if targetEnv passes check contains exactly the properties of envTemplate
         if (!regexVal(envTemplate, targetEnv)) {
