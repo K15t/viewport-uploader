@@ -14,6 +14,7 @@ const { showLog } = require('./lib/console');
 
 // ----------------- Configuration ----------------- //
 
+// Note: If you change the plugin name here change it in all other files as well
 const PLUGIN_NAME = 'viewport-sync';
 
 const vpconfigName = ".vpconfig.json";
@@ -231,4 +232,3 @@ class ViewportTheme {
 }
 
 module.exports = ViewportTheme;
-module.exports.PLUGIN_NAME = PLUGIN_NAME;
