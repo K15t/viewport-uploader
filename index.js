@@ -7,10 +7,10 @@ const os = require('os');
 const PluginError = require('plugin-error');
 
 // ToDo: use async loadConfig instead of loadConfigSync
-const { loadConfig, loadConfigSync, createFormData, resolveGlob } = require('./lib/files.js');
-const { fetchTheme, existsTheme, createTheme, resetTheme, uploadTheme } = require('./lib/network.js');
-const { regexVal, regexValArr } = require('./lib/validate.js');
-const { showLog } = require('./lib/console.js');
+const { loadConfig, loadConfigSync, createFormData, resolveGlob } = require('./lib/files');
+const { fetchTheme, existsTheme, createTheme, resetTheme, uploadTheme } = require('./lib/network');
+const { regexVal, regexValArr } = require('./lib/validate');
+const { showLog } = require('./lib/console');
 
 // ----------------- Configuration ----------------- //
 
@@ -231,4 +231,4 @@ class ViewportTheme {
 }
 
 module.exports = ViewportTheme;
-exports.PLUGIN_NAME = PLUGIN_NAME;
+module.exports.PLUGIN_NAME = PLUGIN_NAME;
