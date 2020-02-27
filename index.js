@@ -20,13 +20,13 @@ const vpconfigName = ".vpconfig.json";
 const vpconfigPath = path.join(os.homedir(), vpconfigName); // absolute path
 
 // ToDo: put in proper restrictions from Scroll Viewport for envName, username, password
-// Note: If you change something here change it in viewport-tools as well!
+// Note: If you change something in this template object, change it in viewport-tools as well!
 const envTemplate = {
     'envName': /.*/i,
     'confluenceBaseUrl': /^(https?):\/\/[^\s$.?#].[^\s]*[^/]$/i,
     'username': /.*/i,
     'password': /.*/i,
-    'scope': /^[a-z0-9]{0,255}$/i, // https://confluence.atlassian.com/doc/space-keys-829076188.html
+    'spaceKey': /^[a-z0-9]{0,255}$/i, // https://confluence.atlassian.com/doc/space-keys-829076188.html
 };
 
 const uplTemplate = {
@@ -40,11 +40,11 @@ const envVarNames = {
     'confluenceBaseUrl': 'VPRT_CONFLUENCEBASEURL',
     'username': 'VPRT_USERNAME',
     'password': 'VPRT_PASSWORD',
-    'scope': 'VPRT_SCOPE',
+    'spaceKey': 'VPRT_SPACEKEY',
 };
 
 const RESTURL_BASE = `/rest/scroll-viewport/1.0`;
-const getRestUrlForThemeObject = (baseUrl, themeName, scope) => baseUrl + `/theme?name=${themeName}&scope=${scope}`;
+const getRestUrlForThemeObject = (baseUrl, themeName, spaceKey) => baseUrl + `/theme?name=${themeName}&scope=${spaceKey}`;
 const getRestUrlForThemeCreation = (baseUrl) => baseUrl + `/theme`;
 const getRestUrlForThemeResources = (baseUrl, themeId) => baseUrl + `/theme/${themeId}/resource`;
 
@@ -118,7 +118,7 @@ class ViewportTheme {
     }
 
     get restUrlForThemeObject() {
-        return getRestUrlForThemeObject(this.restUrlBase, this.themeName, this.scope);
+        return getRestUrlForThemeObject(this.restUrlBase, this.themeName, this.spaceKey);
     }
 
     get restUrlForThemeCreation() {

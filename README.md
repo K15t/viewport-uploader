@@ -39,8 +39,8 @@ const theme = new ViewportTheme({
     - `confluenceBaseUrl` &lt;string&gt;: URL of Confluence Server. It may not contain a trailing slash.
     - `username` &lt;string&gt;: username for Confluence Server
     - `password` &lt;string&gt;: password for Confluence Server
-    - `scope` &lt;string&gt;: space key (empty for global). It may contain up to 225 alphanumeric characters. NOTE: Scroll Viewport treats space keys case-sensitive even though for Confluence they are case-insensitive!
-- instead of using a `.vpconfig.json` file, the corresponding environmental variables `VPRT_ENV`,`VPRT_CONFLUENCEBASEURL`,  `VPRT_USERNAME`, `VPRT_PASSWORD`, `VPRT_SCOPE` can be used. They are only used if _no_ `envName` argument is provided to the constructor.
+    - `spaceKey` &lt;string&gt;: space key (empty for global). It may contain up to 225 alphanumeric characters. NOTE: Scroll Viewport treats space keys case-sensitive even though for Confluence they are case-insensitive!
+- instead of using a `.vpconfig.json` file, the corresponding environmental variables `VPRT_ENV`,`VPRT_CONFLUENCEBASEURL`,  `VPRT_USERNAME`, `VPRT_PASSWORD`, `VPRT_SPACEKEY` can be used. They are only used if _no_ `envName` argument is provided to the constructor.
 
 ### Methods
 
@@ -65,8 +65,8 @@ const theme = new ViewportTheme({
 - uploads given resources to a theme with the `themeName` in Scroll Viewport
 - the arguments are an options object containing the following properties:
     - `glob` &lt;string&gt; | &lt;string[]&gt;: file path pattern that should be uploaded, path is taken relative to the CWD, e.g. `build/images/*.jpg`.
-    - `targetPath` &lt;string&gt;: directory path where the resources should be deployed to, path is taken relative to confluenceBaseUrl ???, e.g. `x/y/` results in files being uploaded to `confluenceBaseUrl/x/y/build/images/*.jpg`
-    - `sourcePath` &lt;string&gt;: directory path which should be "subtracted" from glob path when uploading, path is taken relative to the CWD, e.g. `build/images/` results in files being uploaded to `confluenceBaseUrl/x/y/*.jpg`
+    - `targetPath` &lt;string&gt;: directory path where the resources should be deployed to, path is taken relative to confluenceBaseUrl ???, e.g. `x/y/` results in files being uploaded to `confluenceBaseUrl/spaceKey/x/y/build/images/*.jpg`
+    - `sourcePath` &lt;string&gt;: directory path which should be "subtracted" from glob path when uploading, path is taken relative to the CWD, e.g. `build/images/` results in files being uploaded to `confluenceBaseUrl/spaceKey/x/y/*.jpg`
 - since al paths are relative to the CWD, make sure paths do _not_ contain a leading slash and directory paths _do_ contain a trailing slash. Pass an empty string for the CWD itself, not `/`.
 
 
