@@ -29,7 +29,12 @@ const theme = new ViewportTheme({
 
 - the arguments are an options object containing the following properties:
     - `themeName` &lt;string&gt;: name of the theme in Scroll Viewport
-    - `envName` &lt;string&gt;: name of a target environment in `.vpconfig.json` that is used, leave empty to use environmental variables instead
+    - `envName` &lt;string&gt;: name of a target environment in `.vpconfig.json` that is used
+- alternatively environmental variables can be set
+    - `VPRT_THEMENAME`
+    - `VPRT_ENV` (used for error logging only),`VPRT_CONFLUENCEBASEURL`, `VPRT_USERNAME`, `VPRT_PASSWORD`, `VPRT_SPACEKEY`
+- if set environmental variables will always be preferred and the provided options ignored, i.e. no `.vpconfig.json` loaded
+- environmental variables allows CI/CD Pipelines to work
 
 ### Target environment
 
@@ -40,7 +45,6 @@ const theme = new ViewportTheme({
     - `username` &lt;string&gt;: username for Confluence Server
     - `password` &lt;string&gt;: password for Confluence Server
     - `spaceKey` &lt;string&gt;: space key (empty for global). It may contain up to 225 alphanumeric characters. NOTE: Scroll Viewport treats space keys case-sensitive even though for Confluence they are case-insensitive!
-- instead of using a `.vpconfig.json` file, the corresponding environmental variables `VPRT_ENV`,`VPRT_CONFLUENCEBASEURL`,  `VPRT_USERNAME`, `VPRT_PASSWORD`, `VPRT_SPACEKEY` can be used. They are only used if _no_ `envName` argument is provided to the constructor.
 
 ### Methods
 

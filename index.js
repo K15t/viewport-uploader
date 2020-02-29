@@ -44,6 +44,8 @@ const envVarNames = {
     'spaceKey': 'VPRT_SPACEKEY',
 };
 
+const themeNameEV = 'VPRT_THEMENAME';
+
 const RESTURL_BASE = `/rest/scroll-viewport/1.0`;
 const getRestUrlForThemeObject = (baseUrl, themeName, spaceKey) => baseUrl + `/theme?name=${themeName}&scope=${spaceKey}`;
 const getRestUrlForThemeCreation = (baseUrl) => baseUrl + `/theme`;
@@ -57,6 +59,9 @@ class ViewportTheme {
 
     constructor({ themeName, envName }) {
 
+        // if environmental variable exist, use it
+        themeName = process.env[themeNameEV] || themeName;
+
         // validate that themeName is provided
         if (!themeName) {
             throw new PluginError(PLUGIN_NAME, `Can't initialize ViewportTheme instance since themeName is missing.`)
@@ -64,26 +69,29 @@ class ViewportTheme {
 
         let targetEnv;
 
-        // if envName is provided use config file
-        if (envName) {
-
-            // ToDo: with ESNext make async constructor
-            // load target environment from config file
-            targetEnv = loadConfigSync(envName, vpconfigName, vpconfigPath, envTemplate);
-
-            showLog(`The target environment '${envName}' out of the '${vpconfigName}' config file will be used for the theme '${themeName}'.`);
-
-            // if not, use environmental variables, if they all exist
-        } else if (Object.values(envVarNames).every(item => !!process.env[item])) {
+        // if environmental variables all exist, use them
+        if (Object.values(targetEnvEV).every(item => !!process.env[item])) {
 
             targetEnv = Object.keys(envTemplate).reduce((acc, item) => {
-                acc[item] = process.env[envVarNames[item]];
+                acc[item] = process.env[targetEnvEV[item]];
                 return acc;
             }, {});
 
-            showLog(`The target environment '${process.env.VPRT_ENV}' out of the environmental variables will be used for the theme '${themeName}'.`);
+            showLog(
+                `The target environment '${process.env.VPRT_ENV}' out of the environmental variables will be used for the theme '${themeName}'.`);
 
-            // else throw
+         // if not, use config file if envName is provided
+        } else if (envName) {
+
+            // ToDo: with ESNext make async constructor
+            // load target environment from config file
+            targetEnv = loadConfigSync(envName, vpconfigName, vpconfigPath);
+
+            showLog(`The target environment '${targetEnv.envName}' out of the '${vpconfigName}' config file will be used for the theme '${themeName}'.`);
+
+            // if not, use environmental variables, if they all exist
+
+         // else throw
         } else {
             throw new PluginError(PLUGIN_NAME,
                 `Can't initialize ViewportTheme instance since envName or environmental variables are missing.`)
@@ -92,7 +100,7 @@ class ViewportTheme {
         // validate target environment, if targetEnv passes check contains exactly the properties of envTemplate
         if (!regexVal(envTemplate, targetEnv)) {
             throw new PluginError(PLUGIN_NAME,
-                `The target environment '${envName}' in ~/${vpconfigName} contains invalid properties. Please use 'viewport config\' to configure target environments.`);
+                `The target environment '${targetEnv.envName}' in ~/${vpconfigName} contains invalid properties. Please use 'viewport config\' to configure target environments.`);
         }
 
         // set properties of 'this' from targetEnv
