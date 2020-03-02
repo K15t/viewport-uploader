@@ -22,7 +22,7 @@ const vpconfigPath = path.join(os.homedir(), vpconfigName); // absolute path
 
 // ToDo: put in proper restrictions from Scroll Viewport for envName, username, password
 // Note: If you change something in this template object, change it in viewport-tools as well!
-const envTemplate = {
+const targetEnvTemplate = {
     'envName': /.*/i,
     'confluenceBaseUrl': /^(https?):\/\/[^\s$.?#].[^\s]*[^/]$/i,
     'username': /.*/i,
@@ -30,13 +30,13 @@ const envTemplate = {
     'spaceKey': /^[a-z0-9]{0,255}$/i, // https://confluence.atlassian.com/doc/space-keys-829076188.html
 };
 
-const uplTemplate = {
+const uploadTemplate = {
     'targetPath': /^(\w+\/)*$/i,
     'sourcePath': /^(\w+\/)*$/i,
     'glob': /.*/i,
 };
 
-const envVarNames = {
+const targetEnvEV = {
     'envName': 'VPRT_ENV',
     'confluenceBaseUrl': 'VPRT_CONFLUENCEBASEURL',
     'username': 'VPRT_USERNAME',
@@ -72,7 +72,7 @@ class ViewportTheme {
         // if environmental variables all exist, use them
         if (Object.values(targetEnvEV).every(item => !!process.env[item])) {
 
-            targetEnv = Object.keys(envTemplate).reduce((acc, item) => {
+            targetEnv = Object.keys(targetEnvTemplate).reduce((acc, item) => {
                 acc[item] = process.env[targetEnvEV[item]];
                 return acc;
             }, {});
@@ -97,15 +97,15 @@ class ViewportTheme {
                 `Can't initialize ViewportTheme instance since envName or environmental variables are missing.`)
         }
 
-        // validate target environment, if targetEnv passes check contains exactly the properties of envTemplate
-        if (!regexVal(envTemplate, targetEnv)) {
+        // validate target environment, if targetEnv passes check contains exactly the properties of targetEnvTemplate
+        if (!regexVal(targetEnvTemplate, targetEnv)) {
             throw new PluginError(PLUGIN_NAME,
                 `The target environment '${targetEnv.envName}' in ~/${vpconfigName} contains invalid properties. Please use 'viewport config\' to configure target environments.`);
         }
 
         // set properties of 'this' from targetEnv
-        const envTemplateKeys = Object.keys(envTemplate);
-        envTemplateKeys.forEach(item => {
+        const targetEnvTemplateKeys = Object.keys(targetEnvTemplate);
+        targetEnvTemplateKeys.forEach(item => {
             this[item] = targetEnv[item];
         });
 
@@ -203,10 +203,10 @@ class ViewportTheme {
                 `Can't update resources since theme \'${this.themeName}\' doesn't exist yet in Scroll Viewport. Please create it first.`)
         }
 
-        // validate arguments, if options passes check contains exactly the properties of uplTemplate
-        if (!regexValArr(uplTemplate, options)) {
+        // validate arguments, if options passes check contains exactly the properties of uploadTemplate
+        if (!regexValArr(uploadTemplate, options)) {
             throw new PluginError(PLUGIN_NAME,
-                `The options passed to upload() are invalid. Please provide options ${Object.keys(uplTemplate).join(", ")} according to the documentation.`);
+                `The options passed to upload() are invalid. Please provide options ${Object.keys(uploadTemplate).join(", ")} according to the documentation.`);
         }
 
         // compute paths
