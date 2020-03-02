@@ -30,11 +30,10 @@ const theme = new ViewportTheme({
 - the arguments are an options object containing the following properties:
     - `themeName` &lt;string&gt;: name of the theme in Scroll Viewport
     - `envName` &lt;string&gt;: name of a target environment in `.vpconfig.json` that is used
-- alternatively environmental variables can be set
+- alternatively environmental variables can be set, useful for CI/CD pipelines like Bitbucket
     - `VPRT_THEMENAME`
-    - `VPRT_ENV` (used for error logging only),`VPRT_CONFLUENCEBASEURL`, `VPRT_USERNAME`, `VPRT_PASSWORD`, `VPRT_SPACEKEY`
-- if set environmental variables will always be preferred and the provided options ignored, i.e. no `.vpconfig.json` loaded
-- environmental variables allows CI/CD Pipelines to work
+    - `VPRT_ENV` (here used for error logging only),`VPRT_CONFLUENCEBASEURL`, `VPRT_USERNAME`, `VPRT_PASSWORD`, `VPRT_SPACEKEY`
+- if environmental variables are set, will be preferred and argument options ignored, i.e. no `.vpconfig.json` is tried to be loaded
 
 ### Target environment
 
@@ -58,7 +57,8 @@ const theme = new ViewportTheme({
 #### `create()`
 
 - creates a theme with the `themeName` in Scroll Viewport
-- must be run before any other method as it initialises internal variables required by `reset()` and `upload()` (is done asynchronously, must be done outside constructor since a constructor can't be async (as of ES2020), `create` does the job of an otherwise separate `init` method)
+- must be run before any other method as it initialises internal variables required by `reset()` and `upload()`
+  (would have been in constructor, but since operation is asynchronous, must be done outside of constructor because as of ES2020 a constructor can't be async, essentially `create` integrates the job of an otherwise separate `init` method)
 
 #### `reset()`
 
@@ -68,10 +68,10 @@ const theme = new ViewportTheme({
 
 - uploads given resources to a theme with the `themeName` in Scroll Viewport
 - the arguments are an options object containing the following properties:
-    - `glob` &lt;string&gt; | &lt;string[]&gt;: file path pattern that should be uploaded, path is taken relative to the CWD, e.g. `build/images/*.jpg`.
-    - `targetPath` &lt;string&gt;: directory path where the resources should be deployed to, path is taken relative to confluenceBaseUrl ???, e.g. `x/y/` results in files being uploaded to `confluenceBaseUrl/spaceKey/x/y/build/images/*.jpg`
+    - `glob` &lt;string&gt; | &lt;string[]&gt;: file path pattern of resources that should be uploaded, path is taken relative to the CWD, e.g. `build/images/*.jpg`.
+    - `targetPath` &lt;string&gt;: directory path where the resources should be deployed to, path is taken relative to the theme base URL e.g. `x/y/` results in files being uploaded to `confluenceBaseUrl/spaceKey/x/y/build/images/*.jpg`
     - `sourcePath` &lt;string&gt;: directory path which should be "subtracted" from glob path when uploading, path is taken relative to the CWD, e.g. `build/images/` results in files being uploaded to `confluenceBaseUrl/spaceKey/x/y/*.jpg`
-- since al paths are relative to the CWD, make sure paths do _not_ contain a leading slash and directory paths _do_ contain a trailing slash. Pass an empty string for the CWD itself, not `/`.
+- since all paths are relative to the CWD, make sure paths do _not_ contain a leading slash and directory paths _do_ contain a trailing slash. Pass an empty string for the CWD itself, not `/`.
 
 
 ## Roadmap
