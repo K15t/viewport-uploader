@@ -195,7 +195,7 @@ class ViewportTheme {
     }
 
     // overwrites existing resources in theme with new ones in Scroll Viewport
-    async upload(options) {
+    async upload(options, verbose) {
 
         // obligatory existence check
         if (!await this.exists()) {
@@ -210,7 +210,7 @@ class ViewportTheme {
         }
 
         // compute paths
-        const { targetPath, sourcePath, glob } = options;
+        const { glob, targetPath, sourcePath } = options;
 
         let sourcePaths = await resolveGlob(glob);
 
@@ -221,21 +221,30 @@ class ViewportTheme {
 
         const targetPaths = sourcePaths.map(item => path.join(targetPath, path.relative(sourcePath, item)));
 
-        // log paths
+        // log upload
         showLog(`Uploading ${sourcePaths.length} resources to theme '${this.themeName}' in Scroll Viewport...`);
-        sourcePaths.forEach((_, i) => {
-            console.log(sourcePaths[i] + " => " + targetPaths[i])
-        });
+
+        if (verbose === true) {
+            sourcePaths.forEach((_, i) => {
+                console.log(sourcePaths[i] + " => " + targetPaths[i]);
+            });
+        } else {
+            console.log(glob + " => " + path.join(targetPath, path.relative(sourcePath, glob)));
+        }
 
         // create form data and upload
         const formData = await createFormData(sourcePaths, targetPaths);
         const uploadedFilePaths = await uploadTheme.call(this, formData);
 
         // log success
-        showLog(`The following ${uploadedFilePaths.length} resources have been successfully uploaded.`);
-        uploadedFilePaths.forEach(item => {
-            console.log(item)
-        });
+        showLog(`The ${uploadedFilePaths.length} resources have been successfully uploaded.`);
+
+        if (verbose === true) {
+            uploadedFilePaths.forEach(item => {
+                console.log(item);
+            });
+        }
+
     }
 }
 

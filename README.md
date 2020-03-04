@@ -37,13 +37,34 @@ const theme = new ViewportTheme({
 
 ### Target environment
 
-- target environments are stored in the hidden `.vpconfig.json` in the home directory (use the `viewport-tools` to add and edit)
-- an entry must be an object with the following properties
+- a target environment is an object containing the following properties, it's identifying name must be equal to it's `envName` property
     - `envName` &lt;string&gt;: name of target environment
     - `confluenceBaseUrl` &lt;string&gt;: URL of Confluence Server. It may not contain a trailing slash.
     - `username` &lt;string&gt;: username for Confluence Server
     - `password` &lt;string&gt;: password for Confluence Server
     - `spaceKey` &lt;string&gt;: space key (empty for global). It may contain up to 225 alphanumeric characters. NOTE: Scroll Viewport treats space keys case-sensitive even though for Confluence they are case-insensitive!
+- target environments are stored in the hidden `.vpconfig.json` in the home directory
+- use the `viewport-tools config` to create and edit target environments
+
+```json
+// example .vpconfig.json
+{
+  "DEV": {
+    "envName": "DEV",
+    "confluenceBaseUrl": "http://localhost:8090/confluence",
+    "username": "admin",
+    "password": "admin",
+    "spaceKey": "testspace"
+  },
+  "PROD": {
+    "envName": "PROD",
+    "confluenceBaseUrl": "http://localhost:8090/confluence",
+    "username": "admin",
+    "password": "admin",
+    "spaceKey": "prodspace"
+  }
+}
+```
 
 ### Methods
 
@@ -64,14 +85,15 @@ const theme = new ViewportTheme({
 
 - resets a theme with the `themeName` in Scroll Viewport, deletes all resources but doesn't delete the theme itself
 
-#### `upload(options)`
+#### `upload(options, verbose)`
 
 - uploads given resources to a theme with the `themeName` in Scroll Viewport
-- the arguments are an options object containing the following properties:
+- `options` &lt;object&gt;: mandatory, must contain the following properties:
     - `glob` &lt;string&gt; | &lt;string[]&gt;: file path pattern of resources that should be uploaded, path is taken relative to the CWD, e.g. `build/images/*.jpg`.
     - `targetPath` &lt;string&gt;: directory path where the resources should be deployed to, path is taken relative to the theme base URL e.g. `x/y/` results in files being uploaded to `confluenceBaseUrl/spaceKey/x/y/build/images/*.jpg`
     - `sourcePath` &lt;string&gt;: directory path which should be "subtracted" from glob path when uploading, path is taken relative to the CWD, e.g. `build/images/` results in files being uploaded to `confluenceBaseUrl/spaceKey/x/y/*.jpg`
-- since all paths are relative to the CWD, make sure paths do _not_ contain a leading slash and directory paths _do_ contain a trailing slash. Pass an empty string for the CWD itself, not `/`.
+    - since all paths are relative to the CWD, make sure paths do _not_ contain a leading slash and directory paths _do_ contain a trailing slash. Pass an empty string for the CWD itself, not `/`.
+- `verbose` &lt;boolean&gt;: optional, if set to `true` enables detailed logging of the files that are uploaded
 
 
 ## Roadmap
