@@ -6,7 +6,6 @@ const path = require('path');
 const os = require('os');
 const PluginError = require('plugin-error');
 
-// ToDo: use async loadConfig instead of loadConfigSync
 const { loadConfig, loadConfigSync, createFormData, resolveGlob } = require('./lib/files');
 const { fetchTheme, existsTheme, createTheme, resetTheme, uploadTheme } = require('./lib/network');
 const { regexVal, regexValArr } = require('./lib/validate');
@@ -20,7 +19,6 @@ const PLUGIN_NAME = 'viewport-sync';
 const vpconfigName = ".vpconfig.json";
 const vpconfigPath = path.join(os.homedir(), vpconfigName); // absolute path
 
-// ToDo: put in proper restrictions from Scroll Viewport for envName, username, password
 // Note: If you change something in this template object, change it in viewport-tools as well!
 const targetEnvTemplate = {
     'envName': /.*/i,
@@ -83,7 +81,6 @@ class ViewportTheme {
          // if not, use config file if envName is provided
         } else if (envName) {
 
-            // ToDo: with ESNext make async constructor
             // load target environment from config file
             targetEnv = loadConfigSync(envName, vpconfigName, vpconfigPath);
 
@@ -145,8 +142,7 @@ class ViewportTheme {
 
     // ------------ Methods on prototype chain ------------ //
 
-    // ToDo: In ESNext make exists() a private method, or even better a private getter method that closes over doesThemeExist variable so
-    // not even class has access to it checks if a theme exists in Scroll Viewport
+    // checks if theme exists in Scroll Viewport
     async exists() {
 
         // on first run set if theme exists or not
