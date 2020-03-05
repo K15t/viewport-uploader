@@ -3,8 +3,6 @@
 ## Misc
 
 - progress bar for upload: get notified by file stream in form-data, use total file size as reference
-- put proper validation from Scroll Viewport in `envTemplate`
-- ToDo: Test env variables
 
 ## ESNext
 

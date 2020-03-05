@@ -2,12 +2,12 @@
 
 ## Introduction
 
-The `viewport-sync` package is a simple node module to upload local resources to Scroll Viewport. For example, it can be used as part of a gulp workflow to automate building and uploading a theme. It was formerly known as `gulp-viewport`. Read more about the name change in the [CHANGELOG](CHANGELOG.md).
+The `viewport-sync` package is a node module to upload local resources to Scroll Viewport. For example, it can be used as part of a gulp build process to automate building and uploading a theme. It was formerly known as `gulp-viewport`. Read more about the name change in the [CHANGELOG](CHANGELOG.md).
 
 
 ## Getting started
 
-To create a local theme development environment for Scroll Viewport, use the interactive `viewport-tools` to get started quickly. The "default" theme template already provides you with a basic build workflow using gulp that makes use of `viewport-sync` to upload the files to Scroll Viewport. If you use `viewport-tools`, you don't have to go through the trouble of setting up `viewport-sync`.
+To create a local theme development environment for Scroll Viewport, use the interactive `viewport-tools` to get started quickly. The "default" theme template already provides you with a basic build process using gulp that makes use of `viewport-sync` to upload the files to Scroll Viewport. If you use `viewport-tools`, you don't have to go through the trouble of setting up `viewport-sync`.
 
 
 ## Documentation

@@ -229,7 +229,12 @@ class ViewportTheme {
                 console.log(sourcePaths[i] + " => " + targetPaths[i]);
             });
         } else {
-            console.log(glob + " => " + path.join(targetPath, path.relative(sourcePath, glob)));
+            // glob is either a string or string array, otherwise would have bailed out since no files were found
+            if (typeof glob == 'string') {
+                console.log(glob + " => " + path.join(targetPath, path.relative(sourcePath, glob)));
+            } else {
+                glob.forEach(item => {console.log(item + " => " + path.join(targetPath, path.relative(sourcePath, item)))});
+            }
         }
 
         // create form data and upload
