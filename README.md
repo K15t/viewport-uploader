@@ -2,12 +2,14 @@
 
 ## Introduction
 
-The *viewport-uploader* package is a node module to upload local resources to Scroll Viewport. For example, it can be used as part of a gulp build process to automate building and uploading a theme. It was formerly known as *gulp-viewport*. Read more about the name change in the [CHANGELOG](CHANGELOG.md).
+The *viewport-uploader* package is a node module to upload local resources to Scroll Viewport. For example, it can be used as part of a gulp build process to automate building and uploading a theme.
+
+Note: *viewport-uploader* was formerly known as *gulp-viewport*. Read more about the name change in the [CHANGELOG](CHANGELOG.md).
 
 
 ## Getting started
 
-To create a local theme development environment for Scroll Viewport, use the interactive [viewport-cli](#) to get started quickly. The "default" theme template already provides you with a basic build process using gulp that makes use of *viewport-uploader* to upload the files to Scroll Viewport. If you use *viewport-cli*, you don't have to go through the trouble of setting up *viewport-uploader*.
+To create a local theme development environment for Scroll Viewport, use the interactive [viewport-cli][1] to get started quickly. The "default" theme template already provides you with a basic build process using gulp that makes use of *viewport-uploader* to upload the files to Scroll Viewport. If you use *viewport-cli*, you don't have to go through the trouble of setting up *viewport-uploader*.
 
 
 ## Documentation
@@ -66,7 +68,7 @@ const theme = new ViewportTheme({
 }
 ```
 
-[^1]: **Beware**: Scroll Viewport treats space keys case-sensitive even though for Confluence they are case-insensitive. If you provide the wrong case, the upload will fail. ⚠️
+[^1]: **Beware**: Scroll Viewport treats space keys case-sensitive even though for Confluence they are case-insensitive. If you provide the wrong case, the upload will fail without a helpful error message. ⚠️
 
 ### Methods
 
@@ -97,9 +99,11 @@ const theme = new ViewportTheme({
     - since all paths are relative to the CWD, make sure paths do _not_ contain a leading slash and directory paths _do_ contain a trailing slash. Pass an empty string for the CWD itself, not `/`.
 - `verbose` &lt;boolean&gt;: optional, if set to `true` enables detailed logging of the files that are uploaded
 
-[^2]: See documentation of [viewport-cli](#) on URLs.
+[^2]: See documentation of [viewport-cli][1] on URLs.
 
 
 ## Roadmap
 
 - see [Roadmap](Roadmap.md)
+
+[1]: https://github.com/K15t/viewport-cli/
