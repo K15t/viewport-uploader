@@ -2,19 +2,19 @@
 
 ## Introduction
 
-The *viewport-sync* package is a node module to upload local resources to Scroll Viewport. For example, it can be used as part of a gulp build process to automate building and uploading a theme. It was formerly known as *gulp-viewport*. Read more about the name change in the [CHANGELOG](CHANGELOG.md).
+The *viewport-uploader* package is a node module to upload local resources to Scroll Viewport. For example, it can be used as part of a gulp build process to automate building and uploading a theme. It was formerly known as *gulp-viewport*. Read more about the name change in the [CHANGELOG](CHANGELOG.md).
 
 
 ## Getting started
 
-To create a local theme development environment for Scroll Viewport, use the interactive [viewport-tools](#) to get started quickly. The "default" theme template already provides you with a basic build process using gulp that makes use of *viewport-sync* to upload the files to Scroll Viewport. If you use *viewport-tools*, you don't have to go through the trouble of setting up *viewport-sync*.
+To create a local theme development environment for Scroll Viewport, use the interactive [viewport-cli](#) to get started quickly. The "default" theme template already provides you with a basic build process using gulp that makes use of *viewport-uploader* to upload the files to Scroll Viewport. If you use *viewport-cli*, you don't have to go through the trouble of setting up *viewport-uploader*.
 
 
 ## Documentation
 
 - the `ViewportTheme` class provides the methods for uploading resources to Scroll Viewport.
 - the target environment is taken either from the `.vpconfig.json` in the home directory or from environmental variables.
-- for an example how *viewport-sync* can be used, refer to the "default" theme template provided with the *viewport-tools*.
+- for an example how *viewport-uploader* can be used, refer to the "default" theme template provided with the *viewport-cli*.
 
 ### Constructor
 
@@ -44,7 +44,7 @@ const theme = new ViewportTheme({
     - `password` &lt;string&gt;: password for Confluence Server
     - `spaceKey` &lt;string&gt;: space key (empty for global). It may contain up to 225 alphanumeric characters. [^1]
 - target environments are stored in the hidden `.vpconfig.json` in the home directory
-- use the `viewport-tools config` to create and edit target environments
+- use the `viewport config` to create and edit target environments
 
 ```json
 // example .vpconfig.json
@@ -97,7 +97,7 @@ const theme = new ViewportTheme({
     - since all paths are relative to the CWD, make sure paths do _not_ contain a leading slash and directory paths _do_ contain a trailing slash. Pass an empty string for the CWD itself, not `/`.
 - `verbose` &lt;boolean&gt;: optional, if set to `true` enables detailed logging of the files that are uploaded
 
-[^2]: See documentation of [viewport-tools](#) on URLs.
+[^2]: See documentation of [viewport-cli](#) on URLs.
 
 
 ## Roadmap

@@ -1,5 +1,5 @@
 {
-  "name": "viewport-sync",
+  "name": "viewport-uploader",
   "version": "3.0.0",
   "description": "A node module to upload theme resources to Scroll Viewport.",
   "dependencies": {
@@ -17,17 +17,17 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/K15t/viewport-sync.git"
+    "url": "git+https://github.com/K15t/viewport-uploader.git"
   },
   "keywords": [
-    "viewport-sync",
+    "viewport-uploader",
     "scroll-viewport",
     "k15t"
   ],
   "author": "Stefan Kleineikenscheidt <stefan@k15t.com> (http://www.k15t.com/)",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/K15t/viewport-sync/issues"
+    "url": "https://github.com/K15t/viewport-uploader/issues"
   },
-  "homepage": "https://github.com/K15t/viewport-sync#readme"
+  "homepage": "https://github.com/K15t/viewport-uploader#readme"
 }

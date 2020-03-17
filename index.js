@@ -14,12 +14,12 @@ const { showLog } = require('./lib/console');
 // ----------------- Configuration ----------------- //
 
 // Note: If you change the plugin name here change it in all other files as well
-const PLUGIN_NAME = 'viewport-sync';
+const PLUGIN_NAME = 'viewport-uploader';
 
 const vpconfigName = ".vpconfig.json";
 const vpconfigPath = path.join(os.homedir(), vpconfigName); // absolute path
 
-// Note: If you change something in this template object, change it in viewport-tools as well!
+// Note: If you change something in this template object, change it in viewport-cli as well!
 const targetEnvTemplate = {
     'envName': /.*/i,
     'confluenceBaseUrl': /^(https?):\/\/[^\s$.?#].[^\s]*[^/]$/i,
