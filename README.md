@@ -21,7 +21,7 @@ To create a local theme development environment for Scroll Viewport, use the int
 ### Constructor
 
 ```javascript
-const ViewportTheme = require('gulp-viewport');
+const ViewportTheme = require('@k15t/viewport-uploader');
 
 const theme = new ViewportTheme({
     themeName: 'my-viewport-theme',
