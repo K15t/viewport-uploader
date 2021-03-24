@@ -29,8 +29,8 @@ const targetEnvTemplate = {
 };
 
 const uploadTemplate = {
-    'targetPath': /^(\w+\/)*$/i,
-    'sourcePath': /^(\w+\/)*$/i,
+    'targetPath': /^(([a-zA-Z0-9\_\-]*)+\/*)*$/i,
+    'sourcePath': /^(([a-zA-Z0-9\_\-]*)+\/*)*$/i,
     'glob': /.*/i,
 };
 
