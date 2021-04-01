@@ -1,5 +1,12 @@
 # Changelog
 
+
+## 3.1.0
+
+#### `upload()`
+
+- Allow the usage of hyphens in `sourcePath` and `targetPath`.
+
 ## 3.0.0
 
 > `viewport-uploader` is the new `gulp-viewport`.
