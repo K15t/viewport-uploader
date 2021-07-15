@@ -1,5 +1,8 @@
 # Changelog
 
+## 3.1.1
+
+- Add XSRF headers
 
 ## 3.1.0
 
@@ -29,7 +32,7 @@ Now it took us some time to realise our mistakes, but we don't want to be a bad 
 
 - Rewritten from scratch
     - with ES6 syntax, strict mode, `const` variables
-    - much cleaner code, split into modules    
+    - much cleaner code, split into modules
 - All methods are async and return promises
 - Integrates with new `.vpconfig.json` created by `viewport-cli` (see `viewport-cli` for full documentation on changes)
     - accepts only `envName` and `themeName`, target environment is then loaded from `.vpconfig.json`, much easier for `viewport-cli` to create themes
@@ -39,7 +42,7 @@ Now it took us some time to realise our mistakes, but we don't want to be a bad 
     - replaced `request` with `node-fetch` and `form-data`
     - removed `gulp-utils`, `through2` (no streams!), `home-config`, and some others
 - Removed "example" theme (see `viewport-cli` "default" theme instead)
-   
+
 #### constructor
 
 - Removed `themeId` argument in favor of loading it on first `create()` call, less complex to have only one variable (doesThemeExist) instead of two (doesThemeExist, themeId) for which need to check independently before can safely run any method.
