@@ -1,0 +1,30 @@
+{
+  "name": "my-first-viewport",
+  "version": "1.0.0",
+  "description": "Created with Scroll Viewport",
+  "main": "index.js",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/K15t/viewport-uploader"
+  },
+  "author": "K15t GmbH",
+  "license": "ISC",
+  "scripts": {
+    "build": "yarn clean:build && webpack build --config webpack.config.js ",
+    "upload:prod": "yarn clean:build && webpack build --config webpack.config.js --env upload",
+    "upload:dev": "yarn clean:build && webpack build --config webpack.config.js --env upload development",
+    "watch": "yarn clean:build && webpack build --config webpack.config.js --env development --watch",
+    "clean:build": "rm -rf ./build"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.15.0",
+    "@k15t/viewport-uploader": "^3.1.1",
+    "babel-loader": "^8.2.2",
+    "copy-webpack-plugin": "^9.0.1",
+    "css-loader": "^6.2.0",
+    "mini-css-extract-plugin": "^2.2.0",
+    "path": "^0.12.7",
+    "webpack": "^5.50.0",
+    "webpack-cli": "^4.8.0"
+  }
+}

@@ -1,0 +1,21 @@
+<!doctype html>
+
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+
+        <title>My first Scroll Viewport</title>
+        <meta name="description" content="Created with Scroll Viewport">
+
+        <link rel="stylesheet" href="${theme.baseUrl}/css/main.css">
+    </head>
+
+    <body>
+        <div>
+            <h1>My first Scroll Viewport</h1>
+            $page.content
+        </div>
+
+        <script src="${theme.baseUrl}/js/main.js"></script>
+    </body>
+</html>
