@@ -1,6 +1,6 @@
 {
   "name": "@k15t/viewport-uploader",
-  "version": "3.1.1",
+  "version": "3.1.2",
   "description": "A node module to upload theme resources to Scroll Viewport.",
   "dependencies": {
     "chalk": "^3.0.0",

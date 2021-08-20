@@ -1,5 +1,10 @@
 # Changelog
 
+## 3.1.2
+
+- Add basic webpack example
+- Improve error messages
+
 ## 3.1.1
 
 - Add XSRF headers
