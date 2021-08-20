@@ -175,11 +175,3 @@ your/custom/path/
 /your/custom/path
 your/custom/path
 ```
-
-<br /><br />
-
-## Roadmap
-
-- see [Roadmap](Roadmap.md)
-
-[1]: https://github.com/K15t/viewport-cli/
