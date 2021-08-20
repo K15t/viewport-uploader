@@ -97,7 +97,7 @@ class ViewportTheme {
         // validate target environment, if targetEnv passes check contains exactly the properties of targetEnvTemplate
         if (!regexVal(targetEnvTemplate, targetEnv)) {
             throw new PluginError(PLUGIN_NAME,
-                `The target environment '${targetEnv.envName}' in ~/${vpconfigName} contains invalid properties. Please use 'viewport config\' to configure target environments.`);
+                `The target environment '${targetEnv.envName}' in ~/${vpconfigName} contains invalid properties. Please see https://github.com/K15t/viewport-uploader for further information on how to add target environments to ~/${vpconfigName}.`);
         }
 
         // set properties of 'this' from targetEnv

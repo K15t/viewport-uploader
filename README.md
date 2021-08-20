@@ -1,26 +1,89 @@
-# Readme
+# Viewport Uploader
+
+[![Latest Version](https://img.shields.io/npm/v/@k15t/viewport-uploader)](https://www.npmjs.com/package/@k15t/viewport-uploader)
 
 ## Introduction
 
-The *viewport-uploader* package is a node module to upload local resources to Scroll Viewport. For example, it can be used as part of a gulp build process to automate building and uploading a theme.
+The *viewport-uploader* package is a node module to upload local resources to Scroll Viewport App inside Atlassian Confluence. For example, it can be used as part of a webpack build process to automate building and uploading a theme.
 
 Note: *viewport-uploader* was formerly known as *gulp-viewport*. Read more about the name change in the [CHANGELOG](CHANGELOG.md).
 
+## Getting started with Scroll Viewport theme development
 
-## Getting started
+See the [basic example](examples/basic/README.md) on how to use viewpoort-uploader with webpack as a starting point for Scroll Viewport theme development.
 
-To create a local theme development environment for Scroll Viewport, use the interactive [viewport-cli][1] to get started quickly. The "default" theme template already provides you with a basic build process using gulp that makes use of *viewport-uploader* to upload the files to Scroll Viewport. If you use *viewport-cli*, you don't have to go through the trouble of setting up *viewport-uploader*.
+## Create Environment Config
+
+Viewport Uploader uses Confluence environments specified in `~/.vpconfig.json`. Use this file to provide credentials and Confluence base url that will be used for uploading.
+
+Create the file `.vpconfig.json` in your home directory and add your Confluence environments similar to the example below.
+
+``` json
+// ~/.vpconfig.json
+
+{
+  "DEV": {
+    "envName": "DEV",
+    "confluenceBaseUrl": "http://localhost:8090/confluence",
+    "username": "admin",
+    "password": "admin",
+    "spaceKey": ""
+  },
+  "PROD": {
+    "envName": "PROD",
+    "confluenceBaseUrl": "https://example.com/confluence",
+    "username": "admin",
+    "password": "admin",
+    "spaceKey": "prodspace"
+  }
+}
+```
+
+| Properties | Types  | Description |
+|---|---|---|
+| `envName` | String | Name of target environment. This should also be the name of the identifier. |
+| `confluenceBaseUrl` | String | URL of Confluence Server. It may not contain a trailing slash. |
+| `username` | String | Username for Confluence Server |
+| `password` | String | Password for Confluence Server |
+| `spaceKey` | String | Space key (empty for global). It may contain up to 225 alphanumeric characters. <br /> :warning: &nbsp; Scroll Viewport treats space keys case-sensitive even though for Confluence they are case-insensitive. If you provide the wrong case, the upload will fail without a helpful error message. |
 
 
-## Documentation
+## API Documentation
 
-- the `ViewportTheme` class provides the methods for uploading resources to Scroll Viewport.
-- the target environment is taken either from the `.vpconfig.json` in the home directory or from environmental variables.
-- for an example how *viewport-uploader* can be used, refer to the "default" theme template provided with the *viewport-cli*.
+The `ViewportTheme` class provides methods for uploading resources to Scroll Viewport.
 
-### Constructor
+### Getting started
 
-```javascript
+This is a full example of how viewport uploader works. See the sections below for further details.
+
+``` javascript
+const ViewportTheme = require('@k15t/viewport-uploader');
+
+// Initialize the theme instance
+const themeOptions = {
+    // identifies the theme in the Scroll Viewport app
+    themeName: 'my-viewport-theme', 
+
+    // identifies the environment inside the `~/.vpconfig.json`
+    envName: 'DEV' 
+}
+
+const theme = new ViewportTheme(themeOptions);
+
+// Upload theme code
+const uploadOptions = {
+    glob: 'build/',
+    sourcePath: 'build/',
+    targetPath: ''
+}
+
+theme.upload(uploadOptions, true);
+
+```
+
+### Initialize a `ViewportTheme` instance
+
+``` javascript
 const ViewportTheme = require('@k15t/viewport-uploader');
 
 const theme = new ViewportTheme({
@@ -29,81 +92,86 @@ const theme = new ViewportTheme({
 });
 ```
 
-- the arguments are an options object containing the following properties:
-    - `themeName` &lt;string&gt;: name of the theme in Scroll Viewport
-    - `envName` &lt;string&gt;: name of a target environment in `.vpconfig.json` that is used
-- alternatively environmental variables can be set, useful for CI/CD pipelines like Bitbucket
-    - `VPRT_THEMENAME`
-    - `VPRT_ENV` (here used for error logging only),`VPRT_CONFLUENCEBASEURL`, `VPRT_USERNAME`, `VPRT_PASSWORD`, `VPRT_SPACEKEY`
-- if environmental variables are set, will be preferred and argument options ignored, i.e. no `.vpconfig.json` is tried to be loaded
+| Property | Type | Description | Required |
+|---|---|---|---|
+| `themeName` | String | Name of the theme in Scroll Viewport | true |
+| `envName` | String | Name of the target environment that is used from `~/.vpconfig.json` | true |
 
-### Target environment
+### Initialize a `ViewportTheme` instance – Using environmental variables
 
-- a target environment is an object containing the following properties, it's identifying name must be equal to it's `envName` property
-    - `envName` &lt;string&gt;: name of target environment
-    - `confluenceBaseUrl` &lt;string&gt;: URL of Confluence Server. It may not contain a trailing slash.
-    - `username` &lt;string&gt;: username for Confluence Server
-    - `password` &lt;string&gt;: password for Confluence Server
-    - `spaceKey` &lt;string&gt;: space key (empty for global). It may contain up to 225 alphanumeric characters. [^1]
-- target environments are stored in the hidden `.vpconfig.json` in the home directory
-- use the `viewport config` to create and edit target environments
+Alternatively environmental variables can be set. This is especially useful for CI/CD pipelines. If all of the following environmental variables are set, they will be preferred. Argument options from eg `~/.vpconfig.json` will be ignored.
 
-```json
-// example .vpconfig.json
-{
-  "DEV": {
-    "envName": "DEV",
-    "confluenceBaseUrl": "http://localhost:8090/confluence",
-    "username": "admin",
-    "password": "admin",
-    "spaceKey": "testspace"
-  },
-  "PROD": {
-    "envName": "PROD",
-    "confluenceBaseUrl": "http://localhost:8090/confluence",
-    "username": "admin",
-    "password": "admin",
-    "spaceKey": "prodspace"
-  }
-}
-```
-
-[^1]: **Beware**: Scroll Viewport treats space keys case-sensitive even though for Confluence they are case-insensitive. If you provide the wrong case, the upload will fail without a helpful error message. ⚠️
+| Environmental Variables | Description |
+|---|---|
+| `VPRT_THEMENAME` | Name of the theme in Scroll Viewport | 
+| `VPRT_ENV` | Name of the target environment that is used from `~/.vpconfig.json` |
+| `VPRT_CONFLUENCEBASEURL` | see [Create Environment Config](#create-environment-config) for more Information |
+| `VPRT_USERNAME` | see [Create Environment Config](#create-environment-config) for more Information |
+| `VPRT_PASSWORD` | see [Create Environment Config](#create-environment-config) for more Information |
+| `VPRT_SPACEKEY` | see [Create Environment Config](#create-environment-config) for more Information |
 
 ### Methods
 
-- all methods are async, i.e. they return promises to which an error handler should be attached
-
-#### `exists()`
-
-- checks if a theme with the `themeName` exists in Scroll Viewport
-- is executed at the beginning of every method, i.e. no need to run it on it's own, every method has existence check built in.
-
-#### `create()`
-
-- creates a theme with the `themeName` in Scroll Viewport
-- must be run before any other method as it initialises internal variables required by `reset()` and `upload()`
-  (would have been in constructor, but since operation is asynchronous, must be done outside of constructor because as of ES2020 a constructor can't be async, essentially `create` integrates the job of an otherwise separate `init` method)
-
-#### `reset()`
-
-- resets a theme with the `themeName` in Scroll Viewport, deletes all resources but doesn't delete the theme itself
-
-#### `upload(options, verbose)`
-
-- uploads given resources to a theme with the `themeName` in Scroll Viewport
-- `options` &lt;object&gt;: mandatory, must contain the following properties:
-    - `glob` &lt;string&gt; | &lt;string[]&gt;: file path pattern of resources that should be uploaded, path is taken relative to the CWD, e.g. `build/images/*.jpg`.
-    - `targetPath` &lt;string&gt;: directory path where the resources should be deployed to, path is taken relative to the theme base URL [^2] e.g. `x/y/` results in files being uploaded to `<themeBaseUrl>/x/y/build/images/*.jpg`
-    - `sourcePath` &lt;string&gt;: directory path which should be "subtracted" from glob path when uploading, path is taken relative to the CWD, e.g. `build/images/` results in files being uploaded to `<themeBaseUrl>/x/y/*.jpg`
-    - since all paths are relative to the CWD, make sure paths do _not_ contain a leading slash and directory paths _do_ contain a trailing slash. Pass an empty string for the CWD itself, not `/`.
-- `verbose` &lt;boolean&gt;: optional, if set to `true` enables detailed logging of the files that are uploaded
-
-[^2]: See documentation of [viewport-cli][1] on URLs.
+All methods are async methods that return a promise.
 
 
-## Roadmap
+**Create a theme**
 
-- see [Roadmap](Roadmap.md)
+``` javascript
+// Creates a theme with the `themeName` in Scroll Viewport
 
-[1]: https://github.com/K15t/viewport-cli/
+await theme.create();
+```
+
+Must be run before any other method as it initialises internal variables required by `reset()` and `upload()`.
+
+---
+
+**Check if a theme exist**
+
+``` javascript
+// Checks if a theme with the `themeName` exists in Scroll Viewport
+
+await theme.exists();
+```
+Is executed at the beginning of every method, i.e. no need to run it on it's own, every method has existence check built in.
+
+---
+
+**Reset a theme**
+
+``` javascript
+// Resets a theme with the `themeName` in Scroll Viewport, deletes all resources but doesn't delete the theme itself
+
+await theme.reset();
+```
+
+---
+
+**Upload a theme**
+
+``` javascript
+await theme.upload({
+    glob: 'build/',
+    sourcePath: 'build/',
+    targetPath: ''
+}, true);
+```
+
+| properties | Type | Description | Required |
+|---|---|---|---|
+| `glob` | String | File path pattern of resources that should be uploaded, path is taken relative to the CWD, e.g. `build/images/*.jpg`. | true |
+| `targetPath` | String | Directory path where the resources should be deployed to, path is taken relative to the theme base URL e.g. `x/y/` results in files being uploaded to `<themeBaseUrl>/x/y/build/images/*.jpg` | true |
+| `sourcePath` | String | Directory path which should be "subtracted" from glob path when uploading, path is taken relative to the CWD, e.g. `build/images/` results in files being uploaded to `<themeBaseUrl>/x/y/*.jpg` | true |
+| `verbose` | Boolean | __Optional__, if set to `true` enables detailed logging of the files that are uploaded | false |
+
+:warning: &nbsp; **Paths should follow this pattern:**
+``` sh
+# Correct: path with a trailing slash and without a leading slash
+your/custom/path/
+
+# Incorrect:
+/your/custom/path/
+/your/custom/path
+your/custom/path
+```
