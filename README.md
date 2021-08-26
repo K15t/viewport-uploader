@@ -10,7 +10,7 @@ Note: *viewport-uploader* was formerly known as *gulp-viewport*. Read more about
 
 ## Getting started with Scroll Viewport theme development
 
-See the [basic example](examples/basic/README.md) on how to use viewpoort-uploader with webpack as a starting point for Scroll Viewport theme development.
+See the [basic example](examples/basic/README.md) on how to use viewport-uploader with webpack as a starting point for Scroll Viewport theme development.
 
 ## Create Environment Config
 
@@ -174,4 +174,16 @@ your/custom/path/
 /your/custom/path/
 /your/custom/path
 your/custom/path
+```
+
+## Advanced Usage
+
+If you would like to create your own webpack configuration or use a different bundler in your CI, use the viewport-uploader package by installing it via yarn or npm. Refer to the above [API Documentation](#api-documentation) for further configuration.
+
+``` sh
+yarn add @k15t/viewport-uploader
+```
+
+``` sh
+npm i @k15t/viewport-uploader
 ```
