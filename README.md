@@ -35,6 +35,12 @@ Create the file `.vpconfig.json` in your home directory and add your Confluence 
     "username": "admin",
     "password": "admin",
     "spaceKey": "prodspace"
+  },
+  "PAT_EXAMPLE": {
+    "envName": "PAT_EXAMPLE",
+    "confluenceBaseUrl": "https://confluence.example.com",
+    "personalAccessToken": "your-personal-access-token",
+    "spaceKey": "myspace"
   }
 }
 ```
@@ -43,8 +49,9 @@ Create the file `.vpconfig.json` in your home directory and add your Confluence 
 |---|---|---|
 | `envName` | String | Name of target environment. This should also be the name of the identifier. |
 | `confluenceBaseUrl` | String | URL of Confluence Server. It may not contain a trailing slash. |
-| `username` | String | Username for Confluence Server |
-| `password` | String | Password for Confluence Server |
+| `username` | String | Username for Confluence Server (required if `personalAccessToken` is not provided). |
+| `password` | String | Password for Confluence Server (required if `personalAccessToken` is not provided). |
+| `personalAccessToken` | String | Personal Access Token for Confluence Server (preferred over username/password if provided). |
 | `spaceKey` | String | Space key (empty for global). It may contain up to 225 alphanumeric characters. <br /> :warning: &nbsp; Scroll Viewport treats space keys case-sensitive even though for Confluence they are case-insensitive. If you provide the wrong case, the upload will fail without a helpful error message. |
 
 
@@ -108,6 +115,7 @@ Alternatively environmental variables can be set. This is especially useful for 
 | `VPRT_CONFLUENCEBASEURL` | see [Create Environment Config](#create-environment-config) for more Information |
 | `VPRT_USERNAME` | see [Create Environment Config](#create-environment-config) for more Information |
 | `VPRT_PASSWORD` | see [Create Environment Config](#create-environment-config) for more Information |
+| `VPRT_PAT` | Personal Access Token (takes precedence over username/password) |
 | `VPRT_SPACEKEY` | see [Create Environment Config](#create-environment-config) for more Information |
 
 ### Methods

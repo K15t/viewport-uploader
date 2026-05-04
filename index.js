@@ -25,8 +25,11 @@ const targetEnvTemplate = {
     'confluenceBaseUrl': /^(https?):\/\/[^\s$.?#].[^\s]*[^/]$/i,
     'username': /.*/i,
     'password': /.*/i,
+    'personalAccessToken': /.*/i,
     'spaceKey': /^[a-z0-9]{0,255}$/i, // https://confluence.atlassian.com/doc/space-keys-829076188.html
 };
+
+const requiredFields = ['envName', 'confluenceBaseUrl', 'spaceKey'];
 
 const uploadTemplate = {
     'targetPath': /^(([a-zA-Z0-9\_\-]*)+\/*)*$/i,
@@ -39,6 +42,7 @@ const targetEnvEV = {
     'confluenceBaseUrl': 'VPRT_CONFLUENCEBASEURL',
     'username': 'VPRT_USERNAME',
     'password': 'VPRT_PASSWORD',
+    'personalAccessToken': 'VPRT_PAT',
     'spaceKey': 'VPRT_SPACEKEY',
 };
 
@@ -68,10 +72,14 @@ class ViewportTheme {
         let targetEnv;
 
         // if environmental variables all exist, use them
-        if (Object.values(targetEnvEV).every(item => !!process.env[item])) {
+        const hasAllRequiredEnv = requiredFields.every(key => !!process.env[targetEnvEV[key]]);
+        const hasPATEnv = !!process.env[targetEnvEV['personalAccessToken']];
+        const hasBasicEnv = !!(process.env[targetEnvEV['username']] && process.env[targetEnvEV['password']]);
+
+        if (hasAllRequiredEnv && (hasPATEnv || hasBasicEnv)) {
 
             targetEnv = Object.keys(targetEnvTemplate).reduce((acc, item) => {
-                acc[item] = process.env[targetEnvEV[item]];
+                if (process.env[targetEnvEV[item]]) acc[item] = process.env[targetEnvEV[item]];
                 return acc;
             }, {});
 
@@ -95,7 +103,9 @@ class ViewportTheme {
         }
 
         // validate target environment, if targetEnv passes check contains exactly the properties of targetEnvTemplate
-        if (!regexVal(targetEnvTemplate, targetEnv)) {
+        // accepts either personalAccessToken or username+password combo
+        const authAlternatives = [['personalAccessToken'], ['username', 'password']];
+        if (!regexVal(targetEnvTemplate, targetEnv, authAlternatives)) {
             throw new PluginError(PLUGIN_NAME,
                 `The target environment '${targetEnv.envName}' in ~/${vpconfigName} contains invalid properties. Please see https://github.com/K15t/viewport-uploader for further information on how to add target environments to ~/${vpconfigName}.`);
         }
@@ -116,6 +126,9 @@ class ViewportTheme {
     // ------------ Getters ------------ //
 
     get autorisation() {
+        if (this.personalAccessToken) {
+            return 'Bearer ' + this.personalAccessToken;
+        }
         return 'Basic ' + Buffer.from(this.username + ':' + this.password).toString('base64');
     }
 
